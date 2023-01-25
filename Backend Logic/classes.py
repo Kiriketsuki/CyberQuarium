@@ -16,9 +16,9 @@ class Animal:
     # Dynamic
     def __init__(self, *args):
 
+        self.dob = time.time()
         if len(args) == 1:
             # Date of birth is the time the animal was created
-            self.dob = time.time()
             self.rarity = args[0]
             # Species of the animal can be [Fish, Mammal, Reptile, Amphibian]
             animal_type = random.choice(species)
