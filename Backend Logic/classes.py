@@ -100,6 +100,9 @@ class Animal:
     def get_yield(self):
         return self.coin_yield
 
+    def get_id(self):
+        return self.id
+
     def print(self):
         print("ID: " + str(self.id))
         print("Rarity: " + self.rarity)
@@ -124,6 +127,9 @@ class Egg:
 
     def hatch(self):
         return Animal(self.rarity)
+
+    def return_json(self):
+        return {"rarity": self.rarity, "cost": self.cost}
 
 # ? Breeder class is used to combine two animals to create a new animal
 class Breeder:
