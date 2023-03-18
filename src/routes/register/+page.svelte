@@ -34,7 +34,8 @@
 
     // Add this function to handle success and proceed to the next step
     function proceed() {
-        // Implement your logic for proceeding to the next step after successful registration
+        var user = { username: email.split('@')[0] };
+        window.location.href = `/home?username=${encodeURIComponent(user.username)}`;
         closeMessage();
     }
 </script>

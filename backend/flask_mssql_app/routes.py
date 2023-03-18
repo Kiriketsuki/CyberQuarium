@@ -69,6 +69,22 @@ def register():
     response = {"status": "success", "message": message}
     return jsonify(response)
 
+@main.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    email = data.get('email')
+    password = data.get('password')
+
+    # Check if user exists in the database and password matches
+    user = User.query.filter_by(email=email).first()
+    if user and user.password == password:
+        response = {"status": "success", "message": "User logged in successfully."}
+        return jsonify(response)
+    else:
+        response = {"status": "error", "message": "Invalid email or password."}
+        return jsonify(response)
+
 
 # ?? helper functions
 
