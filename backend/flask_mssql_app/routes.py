@@ -6,6 +6,7 @@ import re
 import classes as animal_logic
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
+from name_merger import merge_words
 
 main = Blueprint('main', __name__)
 
@@ -226,6 +227,8 @@ def breed_animals():
         animal_1 = animal_model_to_class(animal1)
         animal_2 = animal_model_to_class(animal2)
 
+        new_name = merge_words(animal_1.name, animal_2.name)
+
         # Breed the animals
         breeder = animal_logic.Breeder("breeder")
         breeder.add_animal(animal_1)
@@ -235,6 +238,7 @@ def breed_animals():
 
         # Add the new animal to the database
         new_animal = animal_class_to_model(new_animal, user_id)
+        new_animal.name = new_name
         db.session.add(new_animal)
 
         # Remove the old animals from the database

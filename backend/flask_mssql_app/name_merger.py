@@ -54,11 +54,3 @@ def merge_words(word1, word2):
     merged_phonemes = phonemes1[:break_point1] + phonemes2[break_point2:]
     word = phonemes_to_graphemes(merged_phonemes)
     return word.capitalize()
-
-word1 = "Sea Turtle"
-word2 = "Alligator"
-merged_word = merge_words(word1, word2)
-print(merged_word)
-word3 = "Salamander"
-merged_word = merge_words(merged_word, word3)
-print(merged_word)
