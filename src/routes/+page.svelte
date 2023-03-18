@@ -13,7 +13,7 @@
             </div>
     
             <div class="w-1/2 text-center">
-                <a href="/home">
+                <a href="/testing">
                     Register
                 </a>
             </div>

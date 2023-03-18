@@ -8,3 +8,7 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+    
+class testing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(80), unique=True, nullable=False)
