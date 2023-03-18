@@ -1,28 +1,23 @@
-<body class="w-screen h-screen bg-background flex flex-col justify-center items-center">
+<!-- landing.svelte -->
+<script>
+    import Home from "../routes/home/+page.svelte";
+    import Login from "../routes/login/+page.svelte";
+    import Register from "../routes/register/+page.svelte";
+    import Landing from "../routes/landing/+page.svelte";
+    import { user, currentPage } from "../store.js";
 
-    <div class="w-[80vw] flex flex-col items-center gap-[5rem]">
-        <h1 class="font-title text-text text-9xl">
-            CyberQuarium
-        </h1>
-    
-        <div class="w-full flex flex-row justify-center">
-            <div class="w-1/2 text-center">
-                <a href="/login">
-                    Login
-                </a>
-            </div>
-    
-            <div class="w-1/2 text-center">
-                <a href="/register">
-                    Register
-                </a>
-            </div>
-        </div>
-    </div>
-</body>
-
-<style>
-    a {
-        @apply text-4xl font-headers text-dark_blue;
+    function navigateTo(page) {
+        $currentPage = page;
     }
-</style>
+</script>
+
+<!-- landing.svelte -->
+{#if $currentPage === 'home'}
+  <Home />
+{:else if $currentPage === 'login'}
+  <Login />
+{:else if $currentPage === 'register'}
+  <Register />
+{:else if $currentPage === 'landing'}
+    <Landing />
+{/if}
