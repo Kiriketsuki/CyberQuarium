@@ -30,6 +30,17 @@ class Animal(db.Model):
     coins_yielded = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'dob': self.dob,
+            'rarity': self.rarity,
+            'species': self.species,
+            'name': self.name,
+            'coin_yield': self.coin_yield,
+            'coins_yielded': self.coins_yielded
+        }
+
 class Egg(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rarity = db.Column(db.String, nullable=False)

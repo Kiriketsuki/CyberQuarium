@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request, make_response
 from __init__ import db
 from models import User, Animal, Egg
 import re
-import classes
+import classes as animal_logic
 
 main = Blueprint('main', __name__)
 
@@ -91,7 +91,7 @@ def get_user(username):
 
 @main.route('/api/create_egg')
 def create_egg():
-    egg = classes.Egg()
+    egg = animal_logic.Egg()
     return jsonify({"rarity": egg.get_rarity(), "cost": egg.get_cost()})
 
 @main.route('/api/buy_egg/<string:username>', methods=['POST'])
@@ -132,6 +132,44 @@ def get_eggs(username):
     eggs = [egg.to_dict() for egg in user.eggs]
     return jsonify(eggs), 200
 
+@main.route('/api/user/<string:username>/animals', methods=['GET'])
+def get_animals(username):
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    animals = [animal.to_dict() for animal in user.animals]
+    return jsonify(animals), 200
+
+# routes.py
+@main.route('/hatch', methods=['POST'])
+def hatch():
+    data = request.get_json()
+
+    user = User.query.filter_by(username=data['user']['username']).first()
+    egg = Egg.query.filter_by(id=data['egg']['id']).first()
+
+    egg_rarity = egg.rarity
+    egg_cost = egg.cost
+
+    al_egg = animal_logic.Egg(egg_rarity, egg_cost)
+    animal = al_egg.hatch()
+
+    if not user or not egg:
+        return jsonify({"error": "User or egg not found"}), 404
+
+    
+    # Delete the egg and add the new animal to the database
+    db.session.delete(egg)
+    animal = animal_class_to_model(animal, user.id)
+    db.session.add(animal)
+    db.session.commit()
+
+    # Return the animal's information
+    return jsonify(animal.to_dict()), 200
+    # return jsonify({"message": "Egg hatched successfully"}), 200
+
 
 
 # ?? helper functions
@@ -144,3 +182,22 @@ def is_strong_password(password):
     # At least 8 characters, with uppercase, lowercase, digit, and special character
     password_regex = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
     return re.match(password_regex, password)
+
+def animal_class_to_model(animal_class, user_id):
+    return Animal(
+        dob=animal_class.dob,
+        rarity=animal_class.get_rarity(),
+        species=animal_class.get_species(),
+        name=animal_class.get_name(),
+        coin_yield=animal_class.get_yield(),
+        coins_yielded=animal_class.coins_yielded,
+        user_id=user_id,
+    )
+
+def animal_model_to_class(animal_model):
+    return animal_logic.Animal(
+        animal_model.rarity,
+        animal_model.species,
+        animal_model.name,
+        animal_model.coin_yield,
+    )
