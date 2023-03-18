@@ -8,6 +8,14 @@ class User(db.Model):
     password = db.Column(db.String(80), unique=False, nullable=False)
     coins = db.Column(db.Float, default=100)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'coins': self.coins
+        }
+
     # Relationships
     animals = db.relationship('Animal', backref='owner', lazy=True)
     eggs = db.relationship('Egg', backref='owner', lazy=True)
@@ -27,3 +35,10 @@ class Egg(db.Model):
     rarity = db.Column(db.String, nullable=False)
     cost = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'rarity': self.rarity,
+            'cost': self.cost
+        }

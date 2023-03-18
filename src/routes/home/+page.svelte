@@ -27,7 +27,11 @@
     });
 
     function to_market() {
-        window.location.href = `/market/${username}`;
+        window.location.href = `/market?username=${encodeURIComponent(user.username)}`;
+    }
+
+    function to_inventory() {
+        window.location.href = `/inventory?username=${encodeURIComponent(user.username)}`;
     }
 </script>
 
@@ -35,7 +39,10 @@
     <h1>Welcome, {user.username}!</h1>
     <p>You have {user.coins} coins.</p>
     <p>This is your home page.</p>
-    <div onclick="to_market">
+    <button on:click={to_market}>
         market
-    </div>
+    </button>
+    <button on:click={to_inventory}>
+        inventory
+    </button>
 </div>

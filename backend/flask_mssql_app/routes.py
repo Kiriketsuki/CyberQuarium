@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request, make_response
 from __init__ import db
 from models import User, Animal, Egg
 import re
+import classes
 
 main = Blueprint('main', __name__)
 
@@ -86,6 +87,51 @@ def get_user(username):
         return jsonify({
             'error': 'User not found'
         }), 404
+
+
+@main.route('/api/create_egg')
+def create_egg():
+    egg = classes.Egg()
+    return jsonify({"rarity": egg.get_rarity(), "cost": egg.get_cost()})
+
+@main.route('/api/buy_egg/<string:username>', methods=['POST'])
+def buy_egg(username):
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    egg_data = request.get_json()
+
+    if user.coins < egg_data['cost']:
+        return jsonify({"error": "Insufficient coins"}), 400
+
+    # Subtract egg cost from user's coins
+    user.coins -= egg_data['cost']
+
+    # Create a new egg in the database
+    new_egg = Egg(
+        rarity=egg_data['rarity'],
+        cost=egg_data['cost'],
+        user_id=user.id
+    )
+
+    db.session.add(new_egg)
+    db.session.commit()
+
+    return jsonify(user.to_dict()), 200
+
+# routes.py
+@main.route('/api/user/<string:username>/eggs', methods=['GET'])
+def get_eggs(username):
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    eggs = [egg.to_dict() for egg in user.eggs]
+    return jsonify(eggs), 200
+
 
 
 # ?? helper functions
