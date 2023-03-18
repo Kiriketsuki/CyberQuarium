@@ -1,7 +1,7 @@
 # routes.py
 from flask import Blueprint, jsonify, request, make_response
 from __init__ import db
-from models import User, testing
+from models import User, Animal, Egg
 import re
 
 main = Blueprint('main', __name__)
@@ -9,20 +9,6 @@ main = Blueprint('main', __name__)
 @main.route('/')
 def hello():
     return 'Hello, World!'
-
-@main.route('/api/testing', methods=['POST'])
-def post_testing():
-    data = request.get_json()
-    new_testing = testing(message=data['message'])
-    db.session.add(new_testing)
-    db.session.commit()
-    return jsonify({'message': 'New user created'})
-
-@main.route("/api/view_testings")
-def view_testings():
-    testings = testing.query.all()
-    testing_list = [{'id': testing.id, 'message': testing.message} for testing in testings]
-    return jsonify({'testings': testing_list})
 
 # route to view all users and all info
 @main.route('/api/view_users')
@@ -84,6 +70,22 @@ def login():
     else:
         response = {"status": "error", "message": "Invalid email or password."}
         return jsonify(response)
+    
+
+@main.route('/api/user/<username>', methods=['GET'])
+def get_user(username):
+    user = User.query.filter_by(username=username).first()
+    if user:
+        return jsonify({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'coins': user.coins
+        })
+    else:
+        return jsonify({
+            'error': 'User not found'
+        }), 404
 
 
 # ?? helper functions

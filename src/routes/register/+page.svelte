@@ -3,10 +3,11 @@
     var message = "";
     var status = "error";
     var showMessage = false;
+    var email = "";
     async function handleSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const email = formData.get("email");
+        email = formData.get("email");
         const password = formData.get("password");
         const confirmPassword = formData.get("confirmPassword");
 

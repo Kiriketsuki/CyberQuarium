@@ -28,15 +28,17 @@
                     &times;
                 </button>
             {/if}
-        </div>
-        {#if status === "success"}
+
+            {#if status === "success"}
             <button
                 on:click={onSuccess}
-                class="mt-4 bg-green-500 text-white px-4 py-2 rounded self-center"
+                class="mt-4 bg-green-500 text-green px-4 py-2 rounded self-center z-100"
             >
                 Proceed
             </button>
         {/if}
+        </div>
+        
     </div>
 </div>
 

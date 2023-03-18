@@ -7,13 +7,13 @@
     
         <div class="w-full flex flex-row justify-center">
             <div class="w-1/2 text-center">
-                <a href="/home">
+                <a href="/login">
                     Login
                 </a>
             </div>
     
             <div class="w-1/2 text-center">
-                <a href="/testing">
+                <a href="/register">
                     Register
                 </a>
             </div>
