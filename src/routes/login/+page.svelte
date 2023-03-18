@@ -8,6 +8,7 @@
     let status = "error";
     let showMessage = false;
     let user = {};
+    
 
     async function loginUser() {
         const data = { email, password };

@@ -4,6 +4,8 @@ from __init__ import db
 from models import User, Animal, Egg
 import re
 import classes as animal_logic
+import time
+from apscheduler.schedulers.background import BackgroundScheduler
 
 main = Blueprint('main', __name__)
 
@@ -168,9 +170,80 @@ def hatch():
 
     # Return the animal's information
     return jsonify(animal.to_dict()), 200
-    # return jsonify({"message": "Egg hatched successfully"}), 200
 
 
+@main.route('/api/update-coins')
+def update_coins():
+    current_time = time.time()
+    animals = Animal.query.all()
+    
+    for animal in animals:
+        elapsed_time = current_time - animal.dob
+        elapsed_minutes = elapsed_time // 60
+        animal.coins_yielded = elapsed_minutes * animal.coin_yield / 60
+        db.session.commit()
+    
+    return {'status': 'success'}, 200
+
+@main.route('/api/burn_animal', methods=['POST'])
+def burn_animal():
+    data = request.json
+    animal_id = data['animal_id']
+    user_id = data['user_id']
+
+    # Find the animal in question
+    animal = Animal.query.filter_by(id=animal_id, user_id=user_id).first()
+
+    if animal:
+        # Find the user
+        user = User.query.filter_by(id=user_id).first()
+        yielded = 0
+        if user:
+            # Add the amount of coins yielded to the coin total of the user
+            user.coins += animal.coins_yielded
+            yielded = animal.coins_yielded
+            # Remove the animal from the database
+            db.session.delete(animal)
+            db.session.commit()
+
+            return jsonify({'status': 'success', 'message': f'Animal burned successfully. You have gained {yielded} coins, and have a total of {user.coins}'}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'User not found.'}), 404
+    else:
+        return jsonify({'status': 'error', 'message': 'Animal not found.'}), 404
+
+@main.route('/api/breed_animals', methods=['POST'])
+def breed_animals():
+    animal_id_1 = request.json.get('animal_id_1')
+    animal_id_2 = request.json.get('animal_id_2')
+    user_id = request.json.get('user_id')
+
+    # Retrieve the animals from the database
+    animal1 = Animal.query.get(animal_id_1)
+    animal2 = Animal.query.get(animal_id_2)
+
+    if animal1 and animal2:
+        animal_1 = animal_model_to_class(animal1)
+        animal_2 = animal_model_to_class(animal2)
+
+        # Breed the animals
+        breeder = animal_logic.Breeder("breeder")
+        breeder.add_animal(animal_1)
+        breeder.add_animal(animal_2)
+        new_animal = breeder.breed(animal1.id, animal2.id)
+        new_animal.print()
+
+        # Add the new animal to the database
+        new_animal = animal_class_to_model(new_animal, user_id)
+        db.session.add(new_animal)
+
+        # Remove the old animals from the database
+        db.session.delete(animal1)
+        db.session.delete(animal2)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Animals bred successfully', 'animal': new_animal.to_dict()}), 200
+    else:
+        return jsonify({'status': 'error', 'message': 'One or more animals not found.'}), 404
 
 # ?? helper functions
 
@@ -195,9 +268,23 @@ def animal_class_to_model(animal_class, user_id):
     )
 
 def animal_model_to_class(animal_model):
-    return animal_logic.Animal(
+    return create_animal(
+        animal_model.id,
+        animal_model.dob,
         animal_model.rarity,
         animal_model.species,
         animal_model.name,
         animal_model.coin_yield,
+        animal_model.coins_yielded,
     )
+
+def create_animal(id, dob, rarity, species, name, coin_yield, coins_yielded):
+    animal = animal_logic.Animal(rarity, species, name, coin_yield)
+    animal.id = id
+    animal.dob = dob
+    animal.coins_yielded = coins_yielded
+    return animal
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=update_coins, trigger="interval", minutes=5)
+scheduler.start()

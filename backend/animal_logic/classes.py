@@ -217,4 +217,9 @@ class Breeder:
 
         return new_animal
 
-    
+def create_animal(id, dob, rarity, species, name, coin_yield, coins_yielded, userid):
+    animal = Animal(rarity, species, name, coin_yield)
+    animal.id = id
+    animal.dob = dob
+    animal.coins_yielded = coins_yielded
+    return animal

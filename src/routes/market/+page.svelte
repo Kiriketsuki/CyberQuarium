@@ -79,6 +79,10 @@
         showPopup = false;
         update_egg();
     }
+
+    function to_inventory() {
+        window.location.href = `/inventory?username=${encodeURIComponent(user.username)}`;
+    }
 </script>
 
 
@@ -104,6 +108,10 @@
     <div class="flex flex-col justify-center items-center">
         <p>You have {user.coins} coins.</p>
     </div>
+    
+    <button on:click={to_inventory}>
+        inventory
+    </button>
 </div>
 
 <style>
