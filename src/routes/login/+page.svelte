@@ -1,12 +1,13 @@
 <!-- Login.svelte -->
 <script>
     import MessagePopup from "../../components/MessagePopup.svelte";
-
+    import { data_store } from "../../store.js";
     let email = "";
     let password = "";
     let message = "";
     let status = "error";
     let showMessage = false;
+    let user = {};
 
     async function loginUser() {
         const data = { email, password };
@@ -28,7 +29,8 @@
         showMessage = true;
 
         if (status === "success") {
-            var user = { username: email.split('@')[0] };
+            user = { username: email.split('@')[0] };
+            data_store.user = user;
             window.location.href = `/home?username=${encodeURIComponent(user.username)}`;
             closeMessage();
         }

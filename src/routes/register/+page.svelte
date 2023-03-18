@@ -1,9 +1,11 @@
 <script>
     import MessagePopup from "../../components/MessagePopup.svelte";
+    import { data_store } from "../../store.js";
     var message = "";
     var status = "error";
     var showMessage = false;
     var email = "";
+    var user = {};
     async function handleSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -35,7 +37,7 @@
 
     // Add this function to handle success and proceed to the next step
     function proceed() {
-        var user = { username: email.split('@')[0] };
+        user = { username: email.split('@')[0] };
         window.location.href = `/home?username=${encodeURIComponent(user.username)}`;
         closeMessage();
     }
