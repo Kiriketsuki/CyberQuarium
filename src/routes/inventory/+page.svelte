@@ -2,25 +2,20 @@
     import { onMount, onDestroy } from "svelte";
     import MessagePopup from "../../components/MessagePopup.svelte";
 
-    let username = "";
-    let user = {};
-    let eggs = [];
-    let animals = [];
-    let updateCoinsInterval;
-    let message = "";
-    let status = "error";
-    let showPopup = false;
-    let isLoading = false;
+    var username = "";
+    var user = {};
+    var eggs = [];
+    var animals = [];
+    var message = "";
+    var status = "error";
+    var showPopup = false;
+    var isLoading = false;
 
     onMount(async () => {
-        // isLoading = true;
-        // Get the URL search parameters
         const searchParams = new URLSearchParams(window.location.search);
 
-        // Get the username from the search parameters
         if (searchParams.has("username")) {
             username = searchParams.get("username");
-            // Search the user in the database
             const response = await fetch(
                 `http://localhost:5000/api/user/${username}`
             );
@@ -31,38 +26,20 @@
                 alert("HTTP-Error: " + response.status);
             }
         } else {
-            // Redirect to the login page if the username is not present
             window.location.href = "/login";
         }
 
-        // Get user's eggs
         const eggsResponse = await fetch(
             `http://localhost:5000/api/user/${username}/eggs`
         );
         eggs = await eggsResponse.json();
 
-        // Get user's animals
         const animalsResponse = await fetch(
             `http://localhost:5000/api/user/${username}/animals`
         );
         animals = await animalsResponse.json();
-
-        // async () => {
-        //     updateCoinsInterval = setInterval(async () => {
-        //         const response = await fetch(
-        //             `http://localhost:5000/api/update-coins`
-        //         );
-        //         if (!response.ok) {
-        //             console.error("Error updating coins: " + response.status);
-        //         }
-        //     }, 5 * 60 * 1000);
-        //     window.location.reload();
-        // };
+        refreshYields(show=false);
         isLoading = false;
-    });
-
-    onDestroy(() => {
-        clearInterval(updateCoinsInterval);
     });
 
     async function hatchEgg(eggId) {
@@ -85,12 +62,29 @@
         });
 
         if (response.ok) {
-            const animal = await response.json();
-            // Add code to update the inventory UI with the new animal
-            // refresh the page
             window.location.reload();
         } else {
             alert("HTTP-Error: " + response.status);
+        }
+        isLoading = false;
+    }
+
+    async function refreshYields(show=true) {
+        isLoading = true;
+        showPopup = show;
+        const response = await fetch(
+            `http://localhost:5000/api/update-coins`
+        );
+
+        if (response.ok) {
+            user = await response.json();
+            message = "Yields refreshed!";
+            status = "success";
+            showPopup = true;
+        } else {
+            message = "There was an issue refreshing the yields.";
+            status = "error";
+            showPopup = true;
         }
         isLoading = false;
     }
@@ -111,7 +105,6 @@
         const result = await response.json();
 
         if (response.ok) {
-            // Refresh the animal list
             message = result.message;
             status = "success";
             showPopup = true;
@@ -121,37 +114,33 @@
         isLoading = false;
     }
 
-    function to_home() {
+    function toHome() {
         window.location.href = `/home?username=${encodeURIComponent(
             user.username
         )}`;
     }
 
-    function to_market() {
+    function toMarket() {
         window.location.href = `/market?username=${encodeURIComponent(
             user.username
         )}`;
     }
 
-    // breeding functions
-
-    let selectedAnimals = [];
-    let showBreedButton = false;
-    let animalRefs = {};
+    var selectedAnimals = [];
+    var showBreedButton = false;
+    var animalRefs = {};
 
     function selectAnimal(animalId) {
-        console.log(animalRefs);
         if (selectedAnimals.includes(animalId)) {
             selectedAnimals = selectedAnimals.filter((id) => id !== animalId);
-            animalRefs[animalId].classList.remove("border-2");
+            // animalRefs[animalId].classList.remove("border-2");
             animalRefs[animalId].classList.remove("border-green-500");
             animalRefs[animalId].classList.remove("bg-green");
         } else {
             selectedAnimals.push(animalId);
-            animalRefs[animalId].classList.add("border-2");
+            // animalRefs[animalId].classList.add("border-2");
             animalRefs[animalId].classList.add("border-green-500");
             animalRefs[animalId].classList.add("bg-green");
-
         }
 
         if (selectedAnimals.length === 2) {
@@ -181,7 +170,6 @@
         const result = await response.json();
 
         if (response.ok) {
-            // Refresh the animal list
             message = result.message;
             status = "success";
             showPopup = true;
@@ -196,44 +184,54 @@
     }
 </script>
 
-<body>
-    <div class="container flex flex-wrap">
+<body class="w-[100vw] flex flex-col items-center">
+    <header class="flex items-center justify-between bg-blue-500 p-6 w-full">
+        <h1 class="text-white font-semibold text-2xl">
+            {user.username}'s Inventory
+        </h1>
+        <div class="flex items-center text-white font-semibold">
+            <p>You have {user.coins} coins</p>
+        </div>
+    </header>
+
+    <div class="container flex items-center w-100">
         {#each eggs as egg (egg.id)}
-            <div class="egg-card p-4 m-4">
+            <div class="egg-card p-4 m-4 bg-white rounded shadow-md">
                 <img
                     src="https://cdn.vox-cdn.com/thumbor/W7fnltoIgaRovhaGC9UG53kHfo4=/0x0:876x584/1400x1050/filters:focal(438x292:439x293)/cdn.vox-cdn.com/uploads/chorus_asset/file/13689000/instagram_egg.jpg"
                     alt="Egg"
                     class="egg-image"
                 />
-                <div class="egg-info">
-                    <p>Rarity: {egg.rarity}</p>
-                    <p>Price: {egg.cost} coins</p>
-                </div>
-                <button class="hatch-btn" on:click={() => hatchEgg(egg.id)}
-                    >Hatch</button
+                <ul class="egg-info list-none pl-0 mt-2">
+                    <li>Rarity: {egg.rarity}</li>
+                    <li>Price: {egg.cost} coins</li>
+                </ul>
+                <button
+                    class="hatch-btn w-full mt-4 py-2 bg-green text-white rounded hover:bg-green-600"
+                    on:click={() => hatchEgg(egg.id)}>Hatch</button
                 >
             </div>
         {/each}
     </div>
 
-    <div class="animals-container container flex flex-wrap">
+    <div class="animals-container container flex flex-wrap w-[100vw] items-center justify-center">
         {#each animals as animal}
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div
-                class="animal p-4 m-4"
+                class="animal p-4 m-4 bg-white rounded shadow-md border-2"
                 bind:this={animalRefs[animal.id]}
                 on:click={() => selectAnimal(animal.id)}
             >
                 <img src={animal.image_url} alt="Animal" class="animal-image" />
-                <div class="animal-info">
-                    <p>Rarity: {animal.rarity}</p>
-                    <p>Species: {animal.species}</p>
-                    <p>Name: {animal.name}</p>
-                    <p>Yield: {animal.coin_yield} coins/hour</p>
-                    <p>Yielded: {animal.coins_yielded}</p>
-                </div>
+                <ul class="animal-info list-none pl-0 mt-2">
+                    <li>Rarity: {animal.rarity}</li>
+                    <li>Species: {animal.species}</li>
+                    <li>Name: {animal.name}</li>
+                    <li>Yield: {Number(animal.coin_yield).toFixed(3)} coins/hour</li>
+                    <li>Yielded: {Number(animal.coins_yielded).toFixed(3)}</li>
+                </ul>
                 <button
-                    class="burn-animal-btn"
+                    class="burn-animal-btn w-full mt-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                     on:click={() => burnAnimal(animal.id)}>Burn</button
                 >
             </div>
@@ -250,94 +248,52 @@
     {/if}
 
     {#if showBreedButton}
-        <button on:click={breedAnimals}>Breed Animals</button>
+        <button
+            on:click={breedAnimals}
+            class="mx-auto mt-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >Breed Animals</button
+        >
     {/if}
 
-    <div class="flex flex-col justify-center items-center">
-        <p>You have {user.coins} coins</p>
+    <div class="flex justify-center mt-4">
+        <button
+            on:click={toHome}
+            class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+            Home</button
+        >
+        <button
+            on:click={toMarket}
+            class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >Market</button
+        >
+
+        <button
+            on:click={refreshYields}
+            class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >Refresh Yields</button
+        >
     </div>
-
-    <button on:click={to_home}> home </button>
-
-    <button on:click={to_market}> market </button>
-
     {#if isLoading}
-        <div class="loading-spinner-container">
-            <div class="loading-spinner"></div>
+        <div
+            class="loading-spinner-container fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center"
+        >
+            <div
+                class="loading-spinner w-16 h-16 border-8 border-t-8 border-blue-500 border-solid rounded-full animate-spin"
+            />
         </div>
     {/if}
 </body>
 
 <style>
-    .container {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .egg-card {
-        background-color: white;
-        padding: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
     .egg-image {
         width: 200px;
         height: auto;
     }
 
-    .hatch-btn,
-    .burn-animal-btn {
-        background-color: #4caf50;
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .hatch-btn:hover,
-    .burn-animal-btn:hover {
-        background-color: #45a049;
-    }
-
     .selected {
-        border: 2px solid limegreen;
+        /* border: 2px solid limegreen; */
         box-sizing: border-box;
         @apply bg-green;
-    }
-
-    .loading-spinner-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(255, 255, 255, 0.8);
-        z-index: 9999;
-    }
-
-    .loading-spinner {
-        border: 8px solid #f3f3f3;
-        border-top: 8px solid #3498db;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
     }
 </style>

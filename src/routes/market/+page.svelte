@@ -70,25 +70,28 @@
     }
 </script>
 
-<div class="container mx-auto h-screen flex flex-col justify-center items-center">
+<body class="container mx-auto h-screen flex flex-col items-center gap-10">
+    <header class="flex items-center justify-between bg-blue-500 p-6 w-screen">
+        <h1 class="text-white font-semibold text-2xl">Market</h1>
+        <div class="flex items-center text-white font-semibold">
+            <p>You have {user.coins} coins</p>
+        </div>
+    </header>
+    
     {#if showPopup}
         <MessagePopup {message} {status} onClose={closePopup} onSuccess={successRefresh} />
     {/if}
 
-    <div class="bg-white p-4 rounded shadow-md text-center">
+    <div class="bg-white p-4 rounded shadow-md text-center w-64">
         <img src={egg.image} alt="Egg" class="w-48 mx-auto mb-4" />
-        <div class="egg-info mb-4">
-        <p>Rarity: {egg.rarity}</p>
-            <p>Price: {egg.cost} coins</p>
-        </div>
-        <button class="bg-green-500 hover:bg-green-600 py-2 px-4 rounded" on:click="{buyEgg}">Buy Egg</button>
+        <ul class="egg-info list-none pl-0 mb-4">
+            <li>Rarity: {egg.rarity}</li>
+            <li>Price: {egg.cost} coins</li>
+        </ul>
+        <button class="bg-green hover:bg-green-600 text-white py-2 px-4 rounded w-full" on:click="{buyEgg}">Buy Egg</button>
     </div>
 
-    <div class="mt-4 text-center">
-        <p>You have {user.coins} coins.</p>
-    </div>
-    
     <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" on:click={to_inventory}>
         Inventory
     </button>
-</div>
+</body>
