@@ -1,6 +1,8 @@
 # ! COPIED HERE COS IDK HOW to IMPORT
 import random
 import time
+import requests
+import config
 
 rarity = ['common', 'uncommon', 'rare', 'epic', 'legendary']
 species = ['Fish', 'Mammal', 'Reptile', 'Amphibian']
@@ -48,7 +50,7 @@ class Animal:
         self.coins_yielded = 0
         self.id = Animal.num_animals + 1
         Animal.num_animals += 1
-
+        self.image = self.create_image()
     
     def __del__(self):
         print("Animal " + str(self.id) + " deleted from memory")
@@ -87,6 +89,21 @@ class Animal:
         to_return = self.coins_yielded
         del self
         return to_return
+    
+    def create_image(self):
+        # Create an image of the animal
+        prompt = f"{self.rarity} {self.species} called {self.name}"
+        res = requests.post(
+            "https://api.deepai.org/api/text2img",
+            data={
+                'text': prompt,
+                'grid_size': '1',
+            },
+            headers={'api-key': config.image_api_key}
+        )
+        url = res.json()['output_url']
+        return url
+
         
 
     def get_rarity(self):
@@ -103,9 +120,13 @@ class Animal:
 
     def get_id(self):
         return self.id
+    
+    def get_image(self):
+        return self.image
 
     def print(self):
         print("ID: " + str(self.id))
+        print("Image: " + self.image)
         print("Rarity: " + self.rarity)
         print("Species: " + self.species)
         print("Name: " + self.name)

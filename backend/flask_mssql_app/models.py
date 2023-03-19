@@ -22,6 +22,7 @@ class User(db.Model):
 
 class Animal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    image_url = db.Column(db.String, nullable=False)
     dob = db.Column(db.Float, nullable=False)
     rarity = db.Column(db.String, nullable=False)
     species = db.Column(db.String, nullable=False)
@@ -33,6 +34,7 @@ class Animal(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'image_url': self.image_url,
             'dob': self.dob,
             'rarity': self.rarity,
             'species': self.species,

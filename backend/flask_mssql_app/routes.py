@@ -7,6 +7,7 @@ import classes as animal_logic
 import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from name_merger import merge_words
+import config
 
 main = Blueprint('main', __name__)
 
@@ -234,7 +235,6 @@ def breed_animals():
         breeder.add_animal(animal_1)
         breeder.add_animal(animal_2)
         new_animal = breeder.breed(animal1.id, animal2.id)
-        new_animal.print()
 
         # Add the new animal to the database
         new_animal = animal_class_to_model(new_animal, user_id)
@@ -263,6 +263,7 @@ def is_strong_password(password):
 def animal_class_to_model(animal_class, user_id):
     return Animal(
         dob=animal_class.dob,
+        image_url=animal_class.get_image(),
         rarity=animal_class.get_rarity(),
         species=animal_class.get_species(),
         name=animal_class.get_name(),

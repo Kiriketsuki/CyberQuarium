@@ -215,7 +215,7 @@
                 bind:this={animalRefs[animal.id]}
                 on:click={() => selectAnimal(animal.id)}
             >
-                <img src={animal.image} alt="Animal" class="animal-image" />
+                <img src={animal.image_url} alt="Animal" class="animal-image" />
                 <div class="animal-info">
                     <p>Rarity: {animal.rarity}</p>
                     <p>Species: {animal.species}</p>
