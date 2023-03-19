@@ -6,13 +6,36 @@
     var user = {};
 
     onMount(async () => {
-        // Get the URL search parameters
-        const searchParams = new URLSearchParams(window.location.search);
+        user = await check_session();
+        username = user.username;
+    });
 
-        // Get the username from the search parameters
-        if (searchParams.has("username")) {
-            username = searchParams.get("username");
-            // search the user in the database
+    async function check_session() {
+        // Check if the sessionid is valid
+        var sessionid = window.sessionStorage.getItem("sessionid");
+        var username = window.sessionStorage.getItem("username");
+
+        if (!sessionid || !username) {
+            // Redirect to the login page if the sessionid or username is not present
+            window.location.href = "/login";
+        }
+
+        console.log(sessionid, username)
+
+        // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
+        var response = await fetch("http://localhost:5000/api/session", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: username,
+                sessionid: sessionid,
+            }),
+        });
+
+        if (response.ok) {
+            // If the sessionid is valid, get the user from the database
             var response = await fetch(
                 `http://localhost:5000/api/user/${username}`
             );
@@ -23,21 +46,19 @@
                 alert("HTTP-Error: " + response.status);
             }
         } else {
-            // Redirect to the login page if the username is not present
+            // If the sessionid is not valid, redirect to the login page
             window.location.href = "/login";
         }
-    });
+
+        return user
+    }
 
     function to_market() {
-        window.location.href = `/market?username=${encodeURIComponent(
-            user.username
-        )}`;
+        window.location.href = `/market`;
     }
 
     function to_inventory() {
-        window.location.href = `/inventory?username=${encodeURIComponent(
-            user.username
-        )}`;
+        window.location.href = `/inventory`;
     }
 </script>
 

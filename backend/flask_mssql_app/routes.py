@@ -8,6 +8,8 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from name_merger import merge_words
 import config
+import uuid
+import hashlib
 
 main = Blueprint('main', __name__)
 
@@ -53,6 +55,8 @@ def register():
 
     # Perform user registration logic here
     new_user = User(username=email.split('@')[0], email=email, password=password)
+    session_id = generate_session_id()
+    new_user.session_id = session_id
     db.session.add(new_user)
     db.session.commit()
 
@@ -70,12 +74,38 @@ def login():
     # Check if user exists in the database and password matches
     user = User.query.filter_by(email=email).first()
     if user and user.password == password:
-        response = {"status": "success", "message": "User logged in successfully."}
+        # Check if user has an active session stored in the database
+        print(user.session_id == None)
+
+        # Create a new session for the user
+        session_id = generate_session_id()
+        user.session_id = session_id
+        db.session.commit()
+        response = {"status": "success", "message": "User logged in successfully.", "sessionID": session_id}
         return jsonify(response)
     else:
         response = {"status": "error", "message": "Invalid email or password."}
         return jsonify(response)
     
+# Create an API endpoint which receives a username and sessionid and checks if the session is valid
+@main.route('/api/session', methods=['POST'])
+def check_session():
+    data = request.get_json()
+    username = data.get('username')
+    sessionID = data.get('sessionid')
+    print(sessionID)
+    # Check if user exists in the database
+    user = User.query.filter_by(username=username).first()
+    if user:
+        # Check if session ID matches the one stored in the database
+        print(user.session_id)
+        if user.session_id == sessionID:
+            response = {"status": "success", "message": "Session is valid."}
+            return jsonify(response)
+        
+    response = {"status": "error", "message": "Session is invalid."}
+    return jsonify(response)
+
 
 @main.route('/api/user/<username>', methods=['GET'])
 def get_user(username):
@@ -101,7 +131,7 @@ def create_egg():
 @main.route('/api/buy_egg/<string:username>', methods=['POST'])
 def buy_egg(username):
     user = User.query.filter_by(username=username).first()
-
+    
     if not user:
         return jsonify({"error": "User not found"}), 404
 
@@ -125,7 +155,6 @@ def buy_egg(username):
 
     return jsonify(user.to_dict()), 200
 
-# routes.py
 @main.route('/api/user/<string:username>/eggs', methods=['GET'])
 def get_eggs(username):
     user = User.query.filter_by(username=username).first()
@@ -146,11 +175,10 @@ def get_animals(username):
     animals = [animal.to_dict() for animal in user.animals]
     return jsonify(animals), 200
 
-# routes.py
 @main.route('/hatch', methods=['POST'])
 def hatch():
     data = request.get_json()
-
+    print(data)
     user = User.query.filter_by(username=data['user']['username']).first()
     egg = Egg.query.filter_by(id=data['egg']['id']).first()
 
@@ -189,6 +217,7 @@ def update_coins():
 
 @main.route('/api/burn_animal', methods=['POST'])
 def burn_animal():
+    get_coin_update()
     data = request.json
     animal_id = data['animal_id']
     user_id = data['user_id']
@@ -289,6 +318,32 @@ def create_animal(id, dob, rarity, species, name, coin_yield, coins_yielded):
     animal.dob = dob
     animal.coins_yielded = coins_yielded
     return animal
+
+
+def get_coin_update():
+    current_time = time.time()
+    animals = Animal.query.all()
+    
+    for animal in animals:
+        elapsed_time = current_time - animal.dob
+        elapsed_minutes = elapsed_time // 60
+        animal.coins_yielded = elapsed_minutes * animal.coin_yield / 60
+        db.session.commit()
+
+
+def generate_session_id():
+    """
+    Generate a secure and unique session ID
+    """
+    # Generate a random UUID as the session ID
+    session_id = str(uuid.uuid4())
+    
+    # Generate a hash of the session ID using SHA-256 for added security
+    hash_object = hashlib.sha256(session_id.encode())
+    hash_hex = hash_object.hexdigest()
+    
+    # Return the hashed session ID
+    return hash_hex
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=update_coins, trigger="interval", minutes=5)

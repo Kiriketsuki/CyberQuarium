@@ -7,6 +7,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     coins = db.Column(db.Float, default=100)
+    session_id = db.Column(db.String(80), unique=True, nullable=True)
 
     def to_dict(self):
         return {

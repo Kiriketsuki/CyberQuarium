@@ -2,6 +2,8 @@
     import { onMount, onDestroy } from "svelte";
     import MessagePopup from "../../components/MessagePopup.svelte";
 
+    // var username = window.sessionStorage.getItem("username");
+    // console.log(username);
     var username = "";
     var user = {};
     var eggs = [];
@@ -12,23 +14,10 @@
     var isLoading = false;
 
     onMount(async () => {
-        const searchParams = new URLSearchParams(window.location.search);
-
-        if (searchParams.has("username")) {
-            username = searchParams.get("username");
-            const response = await fetch(
-                `http://localhost:5000/api/user/${username}`
-            );
-
-            if (response.ok) {
-                user = await response.json();
-            } else {
-                alert("HTTP-Error: " + response.status);
-            }
-        } else {
-            window.location.href = "/login";
-        }
-
+        // isLoading = true;
+        user = await check_session();
+        username = user.username;
+        
         const eggsResponse = await fetch(
             `http://localhost:5000/api/user/${username}/eggs`
         );
@@ -38,17 +27,64 @@
             `http://localhost:5000/api/user/${username}/animals`
         );
         animals = await animalsResponse.json();
-        refreshYields((show = false));
+        refreshYields(false);
         isLoading = false;
+        console.log(user)
     });
 
+    async function check_session() {
+        // Check if the sessionid is valid
+        var sessionid = window.sessionStorage.getItem("sessionid");
+        var username = window.sessionStorage.getItem("username");
+
+        if (!sessionid || !username) {
+            // Redirect to the login page if the sessionid or username is not present
+            window.location.href = "/login";
+        }
+
+        console.log(sessionid, username)
+
+        // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
+        var response = await fetch("http://localhost:5000/api/session", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: username,
+                sessionid: sessionid,
+            }),
+        });
+
+        if (response.ok) {
+            // If the sessionid is valid, get the user from the database
+            var response = await fetch(
+                `http://localhost:5000/api/user/${username}`
+            );
+
+            if (response.ok) {
+                user = await response.json();
+                return user;
+            } else {
+                alert("HTTP-Error: " + response.status);
+            }
+        } else {
+            // If the sessionid is not valid, redirect to the login page
+            window.location.href = "/login";
+        }
+
+        return user
+    }
+
     async function hatchEgg(eggId) {
+        console.log(user)
         isLoading = true;
         const egg = eggs.find((e) => e.id === eggId);
         if (!egg) {
             alert("Error: Egg not found");
             return;
         }
+
 
         const response = await fetch("http://localhost:5000/hatch", {
             method: "POST",
@@ -69,20 +105,20 @@
         isLoading = false;
     }
 
-    async function refreshYields(show = true) {
+    async function refreshYields(show) {
         isLoading = true;
         showPopup = show;
         const response = await fetch(`http://localhost:5000/api/update-coins`);
 
         if (response.ok) {
-            user = await response.json();
+            var res = await response.json();
             message = "Yields refreshed!";
             status = "success";
-            showPopup = true;
+            showPopup = false;
         } else {
             message = "There was an issue refreshing the yields.";
             status = "error";
-            showPopup = true;
+            showPopup = false;
         }
         isLoading = false;
     }
@@ -113,15 +149,11 @@
     }
 
     function toHome() {
-        window.location.href = `/home?username=${encodeURIComponent(
-            user.username
-        )}`;
+        window.location.href = `/home`;
     }
 
     function toMarket() {
-        window.location.href = `/market?username=${encodeURIComponent(
-            user.username
-        )}`;
+        window.location.href = `/market`;
     }
 
     var selectedAnimals = [];
@@ -198,7 +230,7 @@
         {#each eggs as egg (egg.id)}
             <div class="egg-card p-4 bg-white rounded shadow-md">
                 <img
-                    src={egg.image}
+                    src="http://photos.newswire.ca/images/20130327_C8486_PHOTO_EN_24852.jpg"
                     alt="Egg"
                     class="egg-image w-48 mx-auto mb-4"
                 />
@@ -300,7 +332,7 @@
         >
 
         <button
-            on:click={refreshYields}
+            on:click={refreshYields(true)}
             class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >Refresh Yields</button
         >

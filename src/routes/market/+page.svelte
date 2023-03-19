@@ -10,22 +10,54 @@
     var showPopup = false;
 
     onMount(async () => {
-        const searchParams = new URLSearchParams(window.location.search);
-        if (searchParams.has("username")) {
-            username = searchParams.get("username");
-            const response = await fetch(
+        user = await check_session();
+        username = user.username;
+        update_egg();
+    });
+
+    async function check_session() {
+        // Check if the sessionid is valid
+        var sessionid = window.sessionStorage.getItem("sessionid");
+        var username = window.sessionStorage.getItem("username");
+
+        if (!sessionid || !username) {
+            // Redirect to the login page if the sessionid or username is not present
+            window.location.href = "/login";
+        }
+
+        console.log(sessionid, username)
+
+        // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
+        var response = await fetch("http://localhost:5000/api/session", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: username,
+                sessionid: sessionid,
+            }),
+        });
+
+        if (response.ok) {
+            // If the sessionid is valid, get the user from the database
+            var response = await fetch(
                 `http://localhost:5000/api/user/${username}`
             );
+
             if (response.ok) {
                 user = await response.json();
+                return user;
             } else {
                 alert("HTTP-Error: " + response.status);
             }
         } else {
+            // If the sessionid is not valid, redirect to the login page
             window.location.href = "/login";
         }
-        update_egg();
-    });
+
+        return user
+    }
 
     async function update_egg() {
         var res = await fetch("http://localhost:5000/api/create_egg");
@@ -72,9 +104,7 @@
     }
 
     function to_inventory() {
-        window.location.href = `/inventory?username=${encodeURIComponent(
-            user.username
-        )}`;
+        window.location.href = `/inventory`;
     }
 </script>
 

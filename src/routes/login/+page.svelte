@@ -1,14 +1,19 @@
 <!-- Login.svelte -->
 <script>
     import MessagePopup from "../../components/MessagePopup.svelte";
-    import { data_store } from "../../store.js";
+    // import { Cookies } from "@sveltejs/kit";
+    import { onMount } from "svelte";
+
     let email = "";
     let password = "";
     let message = "";
     let status = "error";
     let showMessage = false;
     let user = {};
-    
+
+    // onMount(async () => {
+    //     console.log(Cookies.Page.get("username"));
+    // });
 
     async function loginUser() {
         const data = { email, password };
@@ -31,8 +36,10 @@
 
         if (status === "success") {
             user = { username: email.split('@')[0] };
-            data_store.user = user;
-            window.location.href = `/home?username=${encodeURIComponent(user.username)}`;
+            var sessionid = result.sessionID;
+            window.sessionStorage.setItem("username", user.username);
+            window.sessionStorage.setItem("sessionid", sessionid);
+            window.location.href = `/home`;
             closeMessage();
         }
     }
