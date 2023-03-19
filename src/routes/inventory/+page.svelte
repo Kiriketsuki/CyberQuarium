@@ -10,8 +10,10 @@
     let message = "";
     let status = "error";
     let showPopup = false;
+    let isLoading = false;
 
     onMount(async () => {
+        // isLoading = true;
         // Get the URL search parameters
         const searchParams = new URLSearchParams(window.location.search);
 
@@ -45,17 +47,18 @@
         );
         animals = await animalsResponse.json();
 
-        async () => {
-            updateCoinsInterval = setInterval(async () => {
-                const response = await fetch(
-                    `http://localhost:5000/api/update-coins`
-                );
-                if (!response.ok) {
-                    console.error("Error updating coins: " + response.status);
-                }
-            }, 5 * 60 * 1000);
-            window.location.reload();
-        };
+        // async () => {
+        //     updateCoinsInterval = setInterval(async () => {
+        //         const response = await fetch(
+        //             `http://localhost:5000/api/update-coins`
+        //         );
+        //         if (!response.ok) {
+        //             console.error("Error updating coins: " + response.status);
+        //         }
+        //     }, 5 * 60 * 1000);
+        //     window.location.reload();
+        // };
+        isLoading = false;
     });
 
     onDestroy(() => {
@@ -63,6 +66,7 @@
     });
 
     async function hatchEgg(eggId) {
+        isLoading = true;
         const egg = eggs.find((e) => e.id === eggId);
         if (!egg) {
             alert("Error: Egg not found");
@@ -88,9 +92,11 @@
         } else {
             alert("HTTP-Error: " + response.status);
         }
+        isLoading = false;
     }
 
     async function burnAnimal(animalId) {
+        isLoading = true;
         const response = await fetch("http://localhost:5000/api/burn_animal", {
             method: "POST",
             headers: {
@@ -112,6 +118,7 @@
         } else {
             console.error(result.message);
         }
+        isLoading = false;
     }
 
     function to_home() {
@@ -155,6 +162,7 @@
     }
 
     async function breedAnimals() {
+        isLoading = true;
         const response = await fetch(
             "http://localhost:5000/api/breed_animals",
             {
@@ -180,6 +188,7 @@
         } else {
             console.error(result.message);
         }
+        isLoading = false;
     }
 
     function onSuccess() {
@@ -251,6 +260,12 @@
     <button on:click={to_home}> home </button>
 
     <button on:click={to_market}> market </button>
+
+    {#if isLoading}
+        <div class="loading-spinner-container">
+            <div class="loading-spinner"></div>
+        </div>
+    {/if}
 </body>
 
 <style>
@@ -293,5 +308,36 @@
         border: 2px solid limegreen;
         box-sizing: border-box;
         @apply bg-green;
+    }
+
+    .loading-spinner-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+    }
+
+    .loading-spinner {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
