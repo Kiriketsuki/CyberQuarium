@@ -1,7 +1,7 @@
 <script>
     import { onMount, onDestroy } from "svelte";
     import MessagePopup from "../../components/MessagePopup.svelte";
-
+    import Navbar from "../../components/Navbar.svelte";
     // var username = window.sessionStorage.getItem("username");
     // console.log(username);
     var username = "";
@@ -29,7 +29,6 @@
         animals = await animalsResponse.json();
         refreshYields(false);
         isLoading = false;
-        console.log(user)
     });
 
     async function check_session() {
@@ -218,13 +217,16 @@
     class="mx-auto min-h-screen w-screen flex flex-col items-center justify-between bg-background text-text"
 >
     <header class="flex items-center justify-between w-full p-6 bg-dark_blue">
-        <h1 class="text-white font-title font-semibold text-2xl">
+        <div class="flex-1"></div>
+        <h1 class="text-white font-title font-semibold text-2xl flex-1">
             {user.username}'s Inventory
         </h1>
         <div class="flex items-center text-white font-headers font-semibold">
             <p>You have {user.coins} coins</p>
         </div>
     </header>
+
+    <Navbar />
 
     <div class="container flex flex-wrap items-center justify-center gap-4">
         {#each eggs as egg (egg.id)}

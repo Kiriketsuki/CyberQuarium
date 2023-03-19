@@ -1,6 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import MessagePopup from "../../components/MessagePopup.svelte";
+    import Navbar from "../../components/Navbar.svelte";
 
     var username = "";
     var user = {};
@@ -115,8 +116,10 @@
 <body
     class="h-screen w-screen flex flex-col items-center gap-10 bg-background text-text justify-between"
 >
+    <Navbar />
     <header class="flex items-center justify-between w-full p-6 bg-dark_blue">
-        <h1 class="text-white font-title font-semibold text-2xl">Market</h1>
+        <div class="flex-1"></div>
+        <h1 class="text-white font-title font-semibold text-2xl flex-1">Market</h1>
         <div class="flex items-center text-white font-headers font-semibold">
             <p>You have {user.coins} coins</p>
         </div>

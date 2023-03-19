@@ -2,6 +2,7 @@
 <script>
     import MessagePopup from "../../components/MessagePopup.svelte";
     import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+    import app from "../../firebase.js";
 
     let email = "";
     let password = "";

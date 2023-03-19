@@ -110,7 +110,19 @@ def google():
         response = {"status": "success", "message": "User logged in successfully.", "sessionID": session_id}
         return jsonify(response)
     
-
+@main.route('/logout', methods=['POST'])
+def logout():
+    data = request.get_json()
+    username = data.get('username')
+    user = User.query.filter_by(username = username).first()
+    if user:
+        user.session_id = None
+        db.session.commit()
+        response = {"status": "success", "message": "User logged out successfully."}
+        return jsonify(response)
+    else:
+        response = {"status": "error", "message": "User not found."}
+        return jsonify(response)
     
 # Create an API endpoint which receives a username and sessionid and checks if the session is valid
 @main.route('/api/session', methods=['POST'])
@@ -118,7 +130,9 @@ def check_session():
     data = request.get_json()
     username = data.get('username')
     sessionID = data.get('sessionid')
-    print(sessionID)
+    if sessionID == None:
+        response = {"status": "error", "message": "Session is invalid."}
+        return jsonify(response)
     # Check if user exists in the database
     user = User.query.filter_by(username=username).first()
     if user:

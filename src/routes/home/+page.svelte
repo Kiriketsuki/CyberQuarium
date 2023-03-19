@@ -1,6 +1,7 @@
 <!-- Home.svelte -->
 <script>
     import { onMount } from "svelte";
+    import Navbar from "../../components/Navbar.svelte";
 
     let username = "";
     var user = {};
@@ -63,14 +64,17 @@
 </script>
 
 <body class="min-h-screen flex flex-col items-center justify-between bg-background text-text">
+    <Navbar />
     <header class="flex items-center justify-between w-screen p-6 bg-dark_blue">
-        <h1 class="text-white font-title font-semibold text-2xl">
-            CyberQuarium
+        <div class="flex-1"></div>
+        <h1 class="text-white font-title font-semibold text-2xl flex-1 text-center">
+          Home
         </h1>
-        <div class="flex items-center text-white font-headers font-semibold">
-            <p>You have {user.coins} coins</p>
+        <div class="flex items-center text-white font-headers font-semibold flex-1 justify-end">
+          <p>You have {user.coins} coins</p>
         </div>
-    </header>
+      </header>
+      
 
     <div class="bg-background p-4 rounded text-9xl text-center w-full">
         <p>Welcome Back! {user.username}</p>
