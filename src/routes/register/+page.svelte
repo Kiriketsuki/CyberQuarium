@@ -1,11 +1,43 @@
 <script>
     import MessagePopup from "../../components/MessagePopup.svelte";
-    import { data_store } from "../../store.js";
+    import app from "../../firebase.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
     var message = "";
     var status = "error";
     var showMessage = false;
     var email = "";
     var user = {};
+
+    const auth = getAuth(app);
+    async function googleLogin() {
+        try {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+
+            // If sucessful, redirect to home page
+            if (result) {
+                user = result.user;
+                var username = user.email.split('@')[0];
+                const response = await fetch("http://localhost:5000/google", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email: user.email, username: username }),
+                });
+                const result2 = await response.json();
+                message = result2.message;
+                status = result2.status;
+                showMessage = true;
+                sessionStorage.setItem("username", username);
+                sessionStorage.setItem("sessionid", result.sessionID);
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async function handleSubmit(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -27,6 +59,8 @@
         const result = await response.json();
         message = result.message;
         status = result.status;
+        sessionStorage.setItem("username", email.split('@')[0]);
+        sessionStorage.setItem("sessionid", result.sessionID);
         showMessage = true;
     }
 
@@ -38,7 +72,7 @@
     // Add this function to handle success and proceed to the next step
     function proceed() {
         user = { username: email.split('@')[0] };
-        window.location.href = `/home?username=${encodeURIComponent(user.username)}`;
+        window.location.href = `/home`;
         closeMessage();
     }
 
@@ -97,6 +131,9 @@
             <div class="flex gap-4 mt-4">
                 <button type="submit" class="hover:bg-amethyst hover:text-background">Register</button>
                 <button type="button" on:click={toLogin} class="hover:bg-amethyst hover:text-background">Login</button>
+                <button type="button" on:click={googleLogin} class="bg-red-600 text-white px-4 py-2 rounded">
+                    Sign Up with Google
+                </button>                
             </div>
         </form>
     </main>

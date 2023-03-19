@@ -87,6 +87,31 @@ def login():
         response = {"status": "error", "message": "Invalid email or password."}
         return jsonify(response)
     
+@main.route('/google', methods=['POST'])
+def google():
+    data = request.get_json()
+    email = data.get('email')
+    username = data.get('username')
+
+    # Check if user exists in the database
+    user = User.query.filter_by(email=email).first()
+    if user:
+        session_id = generate_session_id()
+        user.session_id = session_id
+        db.session.commit()
+        response = {"status": "success", "message": "User logged in successfully.", "sessionID": session_id}
+        return jsonify(response)
+    else:
+        new_user = User(username=username, email=email)
+        session_id = generate_session_id()
+        new_user.session_id = session_id
+        db.session.add(new_user)
+        db.session.commit()
+        response = {"status": "success", "message": "User logged in successfully.", "sessionID": session_id}
+        return jsonify(response)
+    
+
+    
 # Create an API endpoint which receives a username and sessionid and checks if the session is valid
 @main.route('/api/session', methods=['POST'])
 def check_session():
