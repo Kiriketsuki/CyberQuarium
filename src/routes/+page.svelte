@@ -20,9 +20,3 @@
         </div>
     </div>
 </body>
-
-<style>
-    a {
-        @apply text-4xl font-headers text-dark_blue;
-    }
-</style>

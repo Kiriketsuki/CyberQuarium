@@ -38,7 +38,7 @@
             `http://localhost:5000/api/user/${username}/animals`
         );
         animals = await animalsResponse.json();
-        refreshYields(show=false);
+        refreshYields((show = false));
         isLoading = false;
     });
 
@@ -69,12 +69,10 @@
         isLoading = false;
     }
 
-    async function refreshYields(show=true) {
+    async function refreshYields(show = true) {
         isLoading = true;
         showPopup = show;
-        const response = await fetch(
-            `http://localhost:5000/api/update-coins`
-        );
+        const response = await fetch(`http://localhost:5000/api/update-coins`);
 
         if (response.ok) {
             user = await response.json();
@@ -184,51 +182,84 @@
     }
 </script>
 
-<body class="w-[100vw] flex flex-col items-center">
-    <header class="flex items-center justify-between bg-blue-500 p-6 w-full">
-        <h1 class="text-white font-semibold text-2xl">
+<body
+    class="mx-auto min-h-screen w-screen flex flex-col items-center justify-between bg-background text-text"
+>
+    <header class="flex items-center justify-between w-full p-6 bg-dark_blue">
+        <h1 class="text-white font-title font-semibold text-2xl">
             {user.username}'s Inventory
         </h1>
-        <div class="flex items-center text-white font-semibold">
+        <div class="flex items-center text-white font-headers font-semibold">
             <p>You have {user.coins} coins</p>
         </div>
     </header>
 
-    <div class="container flex items-center w-100">
+    <div class="container flex flex-wrap items-center justify-center gap-4">
         {#each eggs as egg (egg.id)}
-            <div class="egg-card p-4 m-4 bg-white rounded shadow-md">
+            <div class="egg-card p-4 bg-white rounded shadow-md">
                 <img
-                    src="https://cdn.vox-cdn.com/thumbor/W7fnltoIgaRovhaGC9UG53kHfo4=/0x0:876x584/1400x1050/filters:focal(438x292:439x293)/cdn.vox-cdn.com/uploads/chorus_asset/file/13689000/instagram_egg.jpg"
+                    src={egg.image}
                     alt="Egg"
-                    class="egg-image"
+                    class="egg-image w-48 mx-auto mb-4"
                 />
-                <ul class="egg-info list-none pl-0 mt-2">
-                    <li>Rarity: {egg.rarity}</li>
-                    <li>Price: {egg.cost} coins</li>
+                <ul class="egg-info list-none pl-0 mb-4">
+                    <li>
+                        <p class="info-label capitalize">Rarity:</p>
+                        <p class="info-label capitalize">{egg.rarity}</p>
+                    </li>
+                    <li>
+                        <p class="info-label">Price:</p>
+                        <p class="info-label">{egg.cost} coins</p>
+                    </li>
                 </ul>
                 <button
-                    class="hatch-btn w-full mt-4 py-2 bg-green text-white rounded hover:bg-green-600"
+                    class="hatch-btn w-full mt-4 py-2 bg-ugreen text-white rounded hover:bg-green-800"
                     on:click={() => hatchEgg(egg.id)}>Hatch</button
                 >
             </div>
         {/each}
     </div>
 
-    <div class="animals-container container flex flex-wrap w-[100vw] items-center justify-center">
+    <div
+        class="animals-container container flex flex-wrap items-center justify-center gap-4"
+    >
         {#each animals as animal}
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div
-                class="animal p-4 m-4 bg-white rounded shadow-md border-2"
+                class="animal p-4 bg-white rounded shadow-md border-2"
                 bind:this={animalRefs[animal.id]}
                 on:click={() => selectAnimal(animal.id)}
             >
-                <img src={animal.image_url} alt="Animal" class="animal-image" />
-                <ul class="animal-info list-none pl-0 mt-2">
-                    <li>Rarity: {animal.rarity}</li>
-                    <li>Species: {animal.species}</li>
-                    <li>Name: {animal.name}</li>
-                    <li>Yield: {Number(animal.coin_yield).toFixed(3)} coins/hour</li>
-                    <li>Yielded: {Number(animal.coins_yielded).toFixed(3)}</li>
+                <img
+                    src={animal.image_url}
+                    alt="Animal"
+                    class="animal-image w-48 mx-auto mb-4"
+                />
+                <ul class="animal-info list-none pl-0 mb-4">
+                    <li>
+                        <p class="info-label capitalize">Rarity:</p>
+                        <p class="info-label capitalize">{animal.rarity}</p>
+                    </li>
+                    <li>
+                        <p class="info-label">Species:</p>
+                        <p class="info-label">{animal.species}</p>
+                    </li>
+                    <li>
+                        <p class="info-label">Name:</p>
+                        <p class="info-label">{animal.name}</p>
+                    </li>
+                    <li>
+                        <p class="info-label">Yield:</p>
+                        <p class="info-label">
+                            {Number(animal.coin_yield).toFixed(3)} coins/hour
+                        </p>
+                    </li>
+                    <li>
+                        <p class="info-label">Yielded:</p>
+                        <p class="info-label">
+                            {Number(animal.coins_yielded).toFixed(3)}
+                        </p>
+                    </li>
                 </ul>
                 <button
                     class="burn-animal-btn w-full mt-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
@@ -255,7 +286,7 @@
         >
     {/if}
 
-    <div class="flex justify-center mt-4">
+    <div class="flex justify-center mb-4">
         <button
             on:click={toHome}
             class="mx-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -286,14 +317,19 @@
 </body>
 
 <style>
-    .egg-image {
-        width: 200px;
-        height: auto;
+    li {
+        @apply flex justify-between;
     }
 
-    .selected {
-        /* border: 2px solid limegreen; */
-        box-sizing: border-box;
-        @apply bg-green;
+    li:not(:last-child) {
+        @apply border-b border-gray-200 pb-2;
+    }
+
+    li:last-child {
+        @apply pt-2;
+    }
+
+    .info-label {
+        @apply font-body font-semibold;
     }
 </style>

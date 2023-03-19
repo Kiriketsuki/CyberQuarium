@@ -41,29 +41,29 @@
     }
 </script>
 
-<body class="container mx-auto h-screen flex flex-col items-center justify-between">
-    <header class="flex items-center justify-between bg-blue-500 p-6 w-screen">
-        <h1 class="text-white font-semibold text-2xl">
+<body class="min-h-screen flex flex-col items-center justify-between bg-background text-text">
+    <header class="flex items-center justify-between w-screen p-6 bg-dark_blue">
+        <h1 class="text-white font-title font-semibold text-2xl">
             CyberQuarium
         </h1>
-        <div class="flex items-center text-white font-semibold">
+        <div class="flex items-center text-white font-headers font-semibold">
             <p>You have {user.coins} coins</p>
         </div>
     </header>
 
-    <div class="bg-white p-4 rounded text-9xl text-center w-screen">
+    <div class="bg-background p-4 rounded text-9xl text-center w-full">
         <p>Welcome Back! {user.username}</p>
     </div>
 
     <div class="mt-4 flex space-x-4 mb-4">
         <button
-            class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            class="bg-ugreen hover:bg-green-800 text-white py-2 px-4 rounded"
             on:click={to_market}
         >
             Market
         </button>
         <button
-            class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+            class="bg-amethyst hover:bg-purple-600 text-white py-2 px-4 rounded"
             on:click={to_inventory}
         >
             Inventory

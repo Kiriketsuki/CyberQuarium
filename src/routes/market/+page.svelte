@@ -13,7 +13,9 @@
         const searchParams = new URLSearchParams(window.location.search);
         if (searchParams.has("username")) {
             username = searchParams.get("username");
-            const response = await fetch(`http://localhost:5000/api/user/${username}`);
+            const response = await fetch(
+                `http://localhost:5000/api/user/${username}`
+            );
             if (response.ok) {
                 user = await response.json();
             } else {
@@ -28,7 +30,8 @@
     async function update_egg() {
         var res = await fetch("http://localhost:5000/api/create_egg");
         egg = await res.json();
-        egg.image = "http://photos.newswire.ca/images/20130327_C8486_PHOTO_EN_24852.jpg"
+        egg.image =
+            "http://photos.newswire.ca/images/20130327_C8486_PHOTO_EN_24852.jpg";
     }
 
     async function buyEgg() {
@@ -37,11 +40,14 @@
             status = "error";
             showPopup = true;
         } else {
-            const response = await fetch(`http://localhost:5000/api/buy_egg/${username}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(egg),
-            });
+            const response = await fetch(
+                `http://localhost:5000/api/buy_egg/${username}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(egg),
+                }
+            );
 
             if (response.ok) {
                 user = await response.json();
@@ -66,32 +72,50 @@
     }
 
     function to_inventory() {
-        window.location.href = `/inventory?username=${encodeURIComponent(user.username)}`;
+        window.location.href = `/inventory?username=${encodeURIComponent(
+            user.username
+        )}`;
     }
 </script>
 
-<body class="container mx-auto h-screen flex flex-col items-center gap-10">
-    <header class="flex items-center justify-between bg-blue-500 p-6 w-screen">
-        <h1 class="text-white font-semibold text-2xl">Market</h1>
-        <div class="flex items-center text-white font-semibold">
+<body
+    class="h-screen w-screen flex flex-col items-center gap-10 bg-background text-text justify-between"
+>
+    <header class="flex items-center justify-between w-full p-6 bg-dark_blue">
+        <h1 class="text-white font-title font-semibold text-2xl">Market</h1>
+        <div class="flex items-center text-white font-headers font-semibold">
             <p>You have {user.coins} coins</p>
         </div>
     </header>
-    
+
     {#if showPopup}
-        <MessagePopup {message} {status} onClose={closePopup} onSuccess={successRefresh} />
+        <MessagePopup
+            {message}
+            {status}
+            onClose={closePopup}
+            onSuccess={successRefresh}
+        />
     {/if}
 
     <div class="bg-white p-4 rounded shadow-md text-center w-64">
-        <img src={egg.image} alt="Egg" class="w-48 mx-auto mb-4" />
+        <img src={egg.image} alt="Egg" class="w-48 mx-auto mb-4 border-b" />
         <ul class="egg-info list-none pl-0 mb-4">
-            <li>Rarity: {egg.rarity}</li>
-            <li>Price: {egg.cost} coins</li>
+            <li class="flex justify-between border-b border-gray-200 pb-2">
+                <p class="capitalize font-body font-semibold">Rarity:</p>
+                <p class="capitalize font-body font-semibold">{egg.rarity}</p>
+            </li>
+            <li class="flex justify-between pt-2">
+                <p class="font-body font-semibold">Price:</p>
+                <p class="font-body font-semibold">{egg.cost} coins</p>
+            </li>
         </ul>
-        <button class="bg-green hover:bg-green-600 text-white py-2 px-4 rounded w-full" on:click="{buyEgg}">Buy Egg</button>
+        <button class="bg-ugreen hover:bg-green-800 text-white py-2 px-4 rounded w-full" on:click="{buyEgg}">Buy Egg</button>
     </div>
 
-    <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" on:click={to_inventory}>
+    <button
+        class="mb-4 bg-amethyst hover:bg-purple-600 text-white py-2 px-4 rounded"
+        on:click={to_inventory}
+    >
         Inventory
     </button>
 </body>

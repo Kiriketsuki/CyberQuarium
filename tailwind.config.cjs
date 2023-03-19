@@ -13,7 +13,9 @@ module.exports = {
                 text: "#484349",
                 light_blue: "#8AF3FF",
                 dark_blue: "#18A999",
-                green: "#109648"
+                ugreen: "#109648",
+                chilli_red: "#D64933",
+                amethyst: "#a663cc",
             },
         },
     },
