@@ -47,15 +47,44 @@
     function closeMessage() {
         showMessage = false;
     }
+
+    function toRegister() {
+        window.location.href = "/register";
+    }
 </script>
 
-<div class="flex flex-col justify-around items-center h-[100vh]">
-    <h1>Login</h1>
+<style>
+    h1 {
+        @apply font-headers text-text mb-8;
+    }
 
-    <div class="w-[100vw] flex flex-col items-center">
-        <form on:submit|preventDefault={loginUser} class="w-1/2 flex flex-col">
+    label {
+        @apply flex gap-10 justify-between items-center w-full mb-4;
+    }
+
+    input {
+        @apply border-2 border-dark_blue w-3/5;
+    }
+
+    button {
+        @apply bg-dark_blue text-text font-headers text-xl px-4 py-2 rounded-md transition-colors duration-300;
+    }
+</style>
+
+<body class="w-screen h-screen bg-background flex flex-col items-center justify-between">
+
+
+    <div class="flex flex-col justify-around items-center h-[80vh]">
+
+        <h1 class="text-white font-title font-semibold text-9xl">
+            CyberQuarium Login
+        </h1>
+
+        <form on:submit|preventDefault={loginUser} class="flex flex-col justify-between items-center w-[30vw]">
             <label for="email">
-                Email
+                <p>
+                    Email:
+                </p>
                 <input
                     type="email"
                     bind:value={email}
@@ -65,7 +94,9 @@
             </label>
 
             <label for="password">
-                Password
+                <p>
+                    Password:
+                </p>
                 <input
                     type="password"
                     bind:value={password}
@@ -74,21 +105,15 @@
                 />
             </label>
 
-            <button type="submit">Login</button>
+            <div>
+                <button type="submit" class="mt-4 hover:bg-amethyst hover:text-background">Login</button>
+                <button type="button" on:click={toRegister}>Register</button>
+            </div>
         </form>
     </div>
 
     {#if showMessage}
         <MessagePopup {message} {status} onClose={closeMessage} />
     {/if}
-</div>
+</body>
 
-<style>
-    label {
-        @apply flex gap-10 justify-between w-1/2;
-    }
-
-    input {
-        @apply border-2 border-black;
-    }
-</style>

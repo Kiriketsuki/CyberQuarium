@@ -25,7 +25,7 @@
             window.location.href = "/login";
         }
 
-        console.log(sessionid, username)
+        console.log(sessionid, username);
 
         // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
         var response = await fetch("http://localhost:5000/api/session", {
@@ -56,7 +56,7 @@
             window.location.href = "/login";
         }
 
-        return user
+        return user;
     }
 
     async function update_egg() {
@@ -106,6 +106,10 @@
     function to_inventory() {
         window.location.href = `/inventory`;
     }
+
+    function toHome() {
+        window.location.href = `/home`;
+    }
 </script>
 
 <body
@@ -139,13 +143,25 @@
                 <p class="font-body font-semibold">{egg.cost} coins</p>
             </li>
         </ul>
-        <button class="bg-ugreen hover:bg-green-800 text-white py-2 px-4 rounded w-full" on:click="{buyEgg}">Buy Egg</button>
+        <button
+            class="bg-ugreen hover:bg-green-800 text-white py-2 px-4 rounded w-full"
+            on:click={buyEgg}>Buy Egg</button
+        >
     </div>
 
-    <button
-        class="mb-4 bg-amethyst hover:bg-purple-600 text-white py-2 px-4 rounded"
-        on:click={to_inventory}
-    >
-        Inventory
-    </button>
+    <div class="flex justify-center mb-4">
+        <button
+            class="bg-amethyst hover:bg-purple-600 text-white py-2 px-4 rounded"
+            on:click={to_inventory}
+        >
+            Inventory
+        </button>
+
+        <button
+            on:click={toHome}
+            class="mx-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+            Home</button
+        >
+    </div>
 </body>

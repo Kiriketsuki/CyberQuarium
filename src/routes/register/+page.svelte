@@ -41,10 +41,65 @@
         window.location.href = `/home?username=${encodeURIComponent(user.username)}`;
         closeMessage();
     }
-</script>
 
-<main class="flex flex-col justify-around items-center h-screen">
-    <h1>Registration</h1>
+    function toLogin() {
+        window.location.href = "/login";
+    }
+</script>
+<style>
+    h1 {
+        @apply font-headers text-text mb-8;
+    }
+
+    label {
+        @apply flex gap-10 justify-between items-center w-full mb-4;
+    }
+
+    input {
+        @apply border-2 border-dark_blue w-3/5;
+    }
+
+    button {
+        @apply bg-dark_blue text-text font-headers text-xl px-4 py-2 rounded-md transition-colors duration-300;
+    }
+</style>
+
+<body class="w-screen h-screen bg-background flex flex-col items-center justify-between">
+
+    <main class="flex flex-col justify-around items-center h-[80vh]">
+        <h1 class="text-white font-title font-semibold text-9xl">
+            CyberQuarium Registration
+        </h1>
+        <form
+            action=""
+            class="flex flex-col justify-between items-center w-[30vw]"
+            on:submit|preventDefault={handleSubmit}
+        >
+            <label for="email">
+                <p>Email:</p>
+                <input type="email" name="email" id="email" />
+            </label>
+
+            <label for="password">
+                <p>Password:</p>
+                <input type="password" name="password" id="password" />
+            </label>
+
+            <label for="confirmPassword">
+                <p>Confirm Password:</p>
+                <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                />
+            </label>
+
+            <div class="flex gap-4 mt-4">
+                <button type="submit" class="hover:bg-amethyst hover:text-background">Register</button>
+                <button type="button" on:click={toLogin} class="hover:bg-amethyst hover:text-background">Login</button>
+            </div>
+        </form>
+    </main>
 
     {#if showMessage}
         <MessagePopup
@@ -54,42 +109,5 @@
             onSuccess={proceed}
         />
     {/if}
-    <div class="w-full flex flex-col items-center">
-        <form
-            action=""
-            class="w-1/2 flex flex-col"
-            on:submit|preventDefault={handleSubmit}
-        >
-            <label for="email">
-                Email
-                <input type="email" name="email" id="email" />
-            </label>
+</body>
 
-            <label for="password">
-                Password
-                <input type="password" name="password" id="password" />
-            </label>
-
-            <label for="confirmPassword">
-                Confirm Password
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    id="confirmPassword"
-                />
-            </label>
-
-            <button type="submit">Register</button>
-        </form>
-    </div>
-</main>
-
-<style>
-    label {
-        @apply flex gap-10 justify-between w-1/2;
-    }
-
-    input {
-        @apply border-2 border-black;
-    }
-</style>
