@@ -6,7 +6,7 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://kiri:kiri@KIROG\SQLEXPRESS/cyberquarium_db?driver=ODBC+Driver+17+for+SQL+Server'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://kiri:kiri@10.20.21.57/cyberquarium_db?driver=ODBC+Driver+17+for+SQL+Server'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
@@ -16,14 +16,7 @@ def create_app():
     # app.wsgi_app = log_request(app)
 
     # register routes
-    from routes import main
+    from .routes import main
     app.register_blueprint(main)
 
-    return app
-
-def log_request(app):
-    def before_request():
-        print(f"Request: {request.method} {request.url}")
-
-    app.before_request(before_request)
     return app
