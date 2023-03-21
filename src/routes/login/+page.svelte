@@ -69,6 +69,8 @@
                     window.sessionStorage.setItem("username", user.username);
                     window.sessionStorage.setItem("sessionid", sessionid);
                     window.location.href = `/home`;
+                } else {
+                    throw new Error(message);
                 }
             }
         } catch (error) {

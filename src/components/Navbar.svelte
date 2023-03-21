@@ -21,7 +21,7 @@
     async function logout() {
         // get user from session storage
         var user = window.sessionStorage.getItem("username");
-        const res = await fetch('http://localhost:5000/logout', {
+        const res = await fetch('https://cqflask-v3to2tehtq-lz.a.run.app/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

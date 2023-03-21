@@ -277,6 +277,10 @@
 
     <Navbar />
 
+    <div class = "items-center justify-center text-4xl text-amethyst font-title">
+        Click on two different animals to breed them! You could get lucky and get a rare unique new animal!
+    </div>
+
     <div class="container flex flex-wrap items-center justify-center gap-4">
         {#each eggs as egg (egg.id)}
             <div class="egg-card p-4 bg-white rounded shadow-md">
