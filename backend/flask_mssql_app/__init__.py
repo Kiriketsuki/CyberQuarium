@@ -11,20 +11,15 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
-
+    with app.app_context():
+        db.create_all()
+        print("DB created")
     # enable CORS
     CORS(app, supports_credentials=True)
     # app.wsgi_app = log_request(app)
 
     # register routes
-    from routes import main
+    from .routes import main
     app.register_blueprint(main)
 
-    return app
-
-def log_request(app):
-    def before_request():
-        print(f"Request: {request.method} {request.url}")
-
-    app.before_request(before_request)
     return app

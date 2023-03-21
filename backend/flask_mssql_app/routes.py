@@ -1,13 +1,13 @@
 # routes.py
 from flask import Blueprint, jsonify, request, make_response
-from __init__ import db
-from models import User, Animal, Egg, MarketListing
+from . import db
+from .models import User, Animal, Egg, MarketListing
 import re
-import classes as animal_logic
+from .classes import Animal as AnimalClass
+from .classes import Egg as EggClass
+from .classes import Breeder
 import time
-from apscheduler.schedulers.background import BackgroundScheduler
-from name_merger import merge_words
-import config
+from .name_merger import merge_words
 import uuid
 import hashlib
 
@@ -60,7 +60,8 @@ def register():
         return jsonify(response)
 
     # Perform user registration logic here
-    new_user = User(username=email.split('@')[0], email=email, password=password)
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    new_user = User(username=email.split('@')[0], email=email, password=hashed_password)
     session_id = generate_session_id()
     new_user.session_id = session_id
     db.session.add(new_user)
@@ -70,6 +71,7 @@ def register():
     response = {"status": "success", "message": message}
     return jsonify(response)
 
+
 @main.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -77,9 +79,16 @@ def login():
     email = data.get('email')
     password = data.get('password')
 
+    if not is_strong_password(password):
+        response = {
+            "status": "error",
+            "message": "Try logging in with Google instead.",
+        }
+        return jsonify(response)
+
     # Check if user exists in the database and password matches
     user = User.query.filter_by(email=email).first()
-    if user and user.password == password:
+    if user and user.password == hashlib.sha256(password.encode()).hexdigest():
         # Check if user has an active session stored in the database
         print(user.session_id == None)
 
@@ -92,6 +101,7 @@ def login():
     else:
         response = {"status": "error", "message": "Invalid email or password."}
         return jsonify(response)
+
     
 @main.route('/google', methods=['POST'])
 def google():
@@ -170,7 +180,7 @@ def get_user(username):
 
 @main.route('/api/create_egg')
 def create_egg():
-    egg = animal_logic.Egg()
+    egg = EggClass()
     return jsonify({"rarity": egg.get_rarity(), "cost": egg.get_cost()})
 
 @main.route('/api/buy_egg/<string:username>', methods=['POST'])
@@ -276,7 +286,7 @@ def hatch():
     egg_rarity = egg.rarity
     egg_cost = egg.cost
 
-    al_egg = animal_logic.Egg(egg_rarity, egg_cost)
+    al_egg = EggClass(egg_rarity, egg_cost)
     animal = al_egg.hatch()
 
     if not user or not egg:
@@ -351,7 +361,7 @@ def breed_animals():
         new_name = merge_words(animal_1.name, animal_2.name)
 
         # Breed the animals
-        breeder = animal_logic.Breeder("breeder")
+        breeder = Breeder("breeder")
         breeder.add_animal(animal_1)
         breeder.add_animal(animal_2)
         new_animal = breeder.breed(animal1.id, animal2.id)
@@ -483,7 +493,7 @@ def animal_model_to_class(animal_model):
     )
 
 def create_animal(id, dob, rarity, species, name, coin_yield, coins_yielded):
-    animal = animal_logic.Animal(rarity, species, name, coin_yield)
+    animal = AnimalClass(rarity, species, name, coin_yield)
     animal.id = id
     animal.dob = dob
     animal.coins_yielded = coins_yielded

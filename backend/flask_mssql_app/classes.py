@@ -2,7 +2,7 @@
 import random
 import time
 import requests
-import config
+from .config import image_api_key
 
 rarity = ['common', 'uncommon', 'rare', 'epic', 'legendary']
 species = ['Fish', 'Mammal', 'Reptile', 'Amphibian']
@@ -99,7 +99,7 @@ class Animal:
                 'text': prompt,
                 'grid_size': '1',
             },
-            headers={'api-key': config.image_api_key}
+            headers={'api-key': image_api_key}
         )
         url = res.json()['output_url']
         return url
