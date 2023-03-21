@@ -179,7 +179,7 @@
     {/if}
 
     <div class="bg-white p-4 rounded shadow-md text-center w-64">
-        <img src={egg.image} alt="Egg" class="w-48 mx-auto mb-4 border-b" />
+        <img src={egg.image} alt="Egg" class="w-48 h-48 mx-auto mb-4 border-b" />
         <ul class="egg-info list-none pl-0 mb-4">
             <li class="flex justify-between border-b border-gray-200 pb-2">
                 <p class="capitalize font-body font-semibold">Rarity:</p>
@@ -283,3 +283,9 @@
         >
     </div>
 </body>
+
+<style>
+    img {
+        object-fit: cover;
+    }
+</style>

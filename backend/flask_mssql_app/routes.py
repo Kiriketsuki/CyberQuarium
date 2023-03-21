@@ -433,6 +433,21 @@ def get_listings():
     listings = [listing.to_dict() for listing in listings]
     return jsonify(listings)
 
+@main.route("/api/animal", methods=["POST"])
+def get_animal():
+    data = request.get_json()
+    animal_id = data.get('animal_id')
+    animal = Animal.query.filter_by(id=animal_id).first()
+    # find owner username
+    username = User.query.filter_by(id=animal.user_id).first().username
+
+    if animal:
+        dict = animal.to_dict()
+        dict['username'] = username
+        return jsonify(dict)
+    else:
+        return jsonify({"status": "error", "message": "Animal not found."})
+
 # ?? helper functions
 
 def is_valid_email(email):

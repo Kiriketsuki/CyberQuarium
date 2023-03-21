@@ -258,7 +258,7 @@
     }
 
     function viewAnimalInfo(animalId) {
-        window.location.href = `/animal/${animalId}`;
+        window.location.href = `/animal?id=${animalId}`;
     }
 </script>
 
