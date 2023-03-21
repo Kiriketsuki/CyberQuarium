@@ -12,12 +12,22 @@ def create_app():
 
     db.init_app(app)
 
+    from .models import User
+    with app.app_context():
+        db.create_all()
+        try:
+            escrow_user = User(username="ESCROW", email = "escrow@admin.com", coins = 9999999)
+            db.session.add(escrow_user)
+            db.session.commit()
+        except:
+            print("db already created")
+        print("DB created")
     # enable CORS
     CORS(app, supports_credentials=True)
     # app.wsgi_app = log_request(app)
 
     # register routes
-    from routes import main
+    from .routes import main
     app.register_blueprint(main)
 
     return app

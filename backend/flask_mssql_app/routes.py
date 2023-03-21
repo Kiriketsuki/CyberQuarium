@@ -1,13 +1,12 @@
 # routes.py
 from flask import Blueprint, jsonify, request, make_response
-from __init__ import db
-from models import User, Animal, Egg, MarketListing
+from . import db
+from .models import User, Animal, Egg, MarketListing
 import re
-import classes as animal_logic
+from .classes import Animal as AnimalClass
+from .classes import Egg as EggClass
 import time
-from apscheduler.schedulers.background import BackgroundScheduler
-from name_merger import merge_words
-import config
+from .name_merger import merge_words
 import uuid
 import hashlib
 
@@ -170,7 +169,7 @@ def get_user(username):
 
 @main.route('/api/create_egg')
 def create_egg():
-    egg = animal_logic.Egg()
+    egg = EggClass()
     return jsonify({"rarity": egg.get_rarity(), "cost": egg.get_cost()})
 
 @main.route('/api/buy_egg/<string:username>', methods=['POST'])
@@ -276,7 +275,7 @@ def hatch():
     egg_rarity = egg.rarity
     egg_cost = egg.cost
 
-    al_egg = animal_logic.Egg(egg_rarity, egg_cost)
+    al_egg = EggClass(egg_rarity, egg_cost)
     animal = al_egg.hatch()
 
     if not user or not egg:
@@ -483,7 +482,7 @@ def animal_model_to_class(animal_model):
     )
 
 def create_animal(id, dob, rarity, species, name, coin_yield, coins_yielded):
-    animal = animal_logic.Animal(rarity, species, name, coin_yield)
+    animal = AnimalClass(rarity, species, name, coin_yield)
     animal.id = id
     animal.dob = dob
     animal.coins_yielded = coins_yielded
