@@ -12,12 +12,14 @@
     var status = "error";
     var showPopup = false;
     var isLoading = false;
+    var listing = false;
+    var listingId = null;
 
     onMount(async () => {
         // isLoading = true;
         user = await check_session();
         username = user.username;
-        
+
         const eggsResponse = await fetch(
             `http://localhost:5000/api/user/${username}/eggs`
         );
@@ -41,7 +43,7 @@
             window.location.href = "/login";
         }
 
-        console.log(sessionid, username)
+        console.log(sessionid, username);
 
         // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
         var response = await fetch("http://localhost:5000/api/session", {
@@ -72,18 +74,17 @@
             window.location.href = "/login";
         }
 
-        return user
+        return user;
     }
 
     async function hatchEgg(eggId) {
-        console.log(user)
+        console.log(user);
         isLoading = true;
         const egg = eggs.find((e) => e.id === eggId);
         if (!egg) {
             alert("Error: Egg not found");
             return;
         }
-
 
         const response = await fetch("http://localhost:5000/hatch", {
             method: "POST",
@@ -211,13 +212,61 @@
     function onSuccess() {
         window.location.reload();
     }
+
+    async function listOnMarket(id, type) {
+        listing = true;
+        const form = document.getElementById("marketForm");
+        console.log(form);
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const listingName = document.querySelector("#listingName").value;
+            const price = document.querySelector("#price").value;
+            const data = {
+                user_id: user.id,
+                item_id: id,
+                item_type: type,
+                listing_name: listingName,
+                price: price,
+            };
+
+            try {
+                const response = await fetch(
+                    "http://localhost:5000/api/market_listing",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    }
+                );
+                const result = await response.json();
+
+                if (response.ok) {
+                    message = result.message;
+                    status = "success";
+                    listing = false;
+                    showPopup = true;
+                } else {
+                    console.error(result.message);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+            // isLoading = false;
+        });
+    }
+
+    function viewAnimalInfo(animalId) {
+        window.location.href = `/animal/${animalId}`;
+    }
 </script>
 
 <body
     class="mx-auto min-h-screen w-screen flex flex-col items-center justify-between bg-background text-text"
 >
     <header class="flex items-center justify-between w-full p-6 bg-dark_blue">
-        <div class="flex-1"></div>
+        <div class="flex-1" />
         <h1 class="text-white font-title font-semibold text-2xl flex-1">
             {user.username}'s Inventory
         </h1>
@@ -246,6 +295,11 @@
                         <p class="info-label">{egg.cost} coins</p>
                     </li>
                 </ul>
+                <button
+                    class="list-on-market-btn w-full mt-4 py-2 bg-ugreen text-white rounded hover:bg-green-800"
+                    on:click={() => listOnMarket(egg.id, "egg")}
+                    >List on Market</button
+                >
                 <button
                     class="hatch-btn w-full mt-4 py-2 bg-ugreen text-white rounded hover:bg-green-800"
                     on:click={() => hatchEgg(egg.id)}>Hatch</button
@@ -299,6 +353,15 @@
                     class="burn-animal-btn w-full mt-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                     on:click={() => burnAnimal(animal.id)}>Burn</button
                 >
+                <button
+                    class="list-on-market-btn w-full mt-4 py-2 bg-ugreen text-white rounded hover:bg-green-800"
+                    on:click={() => listOnMarket(animal.id, "animal")}
+                    >List on Market</button
+                >
+                <button
+                    class="view-info-btn w-full mt-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    on:click={() => viewAnimalInfo(animal.id)}>View Info</button
+                >
             </div>
         {/each}
     </div>
@@ -348,6 +411,46 @@
             />
         </div>
     {/if}
+
+    <div
+        class="fixed z-50 top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center"
+        class:hidden={!listing}
+    >
+        <form class="bg-white p-8 rounded shadow-lg marketForm" id="marketForm">
+            <h2 class="text-xl font-medium mb-4">List on Market</h2>
+            <div class="mb-4">
+                <label
+                    for="listingName"
+                    class="block text-gray-700 font-medium mb-2"
+                    >Listing Name:</label
+                >
+                <input
+                    type="text"
+                    id="listingName"
+                    name="listingName"
+                    class="border border-gray-400 p-2 w-full rounded"
+                    required
+                />
+            </div>
+            <div class="mb-6">
+                <label for="price" class="block text-gray-700 font-medium mb-2"
+                    >Price:</label
+                >
+                <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    class="border border-gray-400 p-2 w-full rounded"
+                    required
+                />
+            </div>
+            <button
+                type="submit"
+                class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded shadow-md"
+                >List on Market</button
+            >
+        </form>
+    </div>
 </body>
 
 <style>

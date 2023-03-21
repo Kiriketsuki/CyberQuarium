@@ -4,7 +4,7 @@ from __init__ import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)
     password = db.Column(db.String(80), unique=False, nullable=True)
     coins = db.Column(db.Float, default=100)
     session_id = db.Column(db.String(80), unique=True, nullable=True)
@@ -55,4 +55,37 @@ class Egg(db.Model):
             'id': self.id,
             'rarity': self.rarity,
             'cost': self.cost
+        }
+    
+class MarketListing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    username = db.Column(db.String(80), nullable=False)
+    item_id = db.Column(db.Integer, nullable=False)
+    listing_name = db.Column(db.String(255), nullable=False)
+    item_type = db.Column(db.String(10), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    image = db.Column(db.String(255), nullable=False)
+    rarity = db.Column(db.String(255), nullable=False)
+    yield_rate = db.Column(db.Float, nullable=True)
+    sold = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return f"<MarketListing {self.listing_name}>"
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'username': self.username,
+            'item_id': self.item_id,
+            'listing_name': self.listing_name,
+            'item_type': self.item_type,
+            'price': self.price,
+            'name': self.name,
+            'image': self.image,
+            'rarity': self.rarity,
+            'yield_rate': self.yield_rate,
+            'sold': self.sold
         }

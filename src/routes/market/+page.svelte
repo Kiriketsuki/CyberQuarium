@@ -9,9 +9,11 @@
     var status = "error";
     var message = "";
     var showPopup = false;
+    var listings = [];
 
     onMount(async () => {
         user = await check_session();
+        listings = await get_listings();
         username = user.username;
         update_egg();
     });
@@ -60,6 +62,17 @@
         return user;
     }
 
+    async function get_listings() {
+        var res = await fetch("http://localhost:5000/api/listings", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        listings = await res.json();
+        return listings;
+    }
+
     async function update_egg() {
         var res = await fetch("http://localhost:5000/api/create_egg");
         egg = await res.json();
@@ -101,6 +114,7 @@
 
     function successRefresh() {
         showPopup = false;
+        window.location.reload();
         update_egg();
     }
 
@@ -111,6 +125,34 @@
     function toHome() {
         window.location.href = `/home`;
     }
+
+    async function buyListing(listing) {
+        if (user.coins < listing.price) {
+            message = "Insufficient coins to buy the item!";
+            status = "error";
+            showPopup = true;
+        } else {
+            const response = await fetch(
+                `http://localhost:5000/api/buy_listing/${username}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(listing),
+                }
+            );
+
+            if (response.ok) {
+                user = await response.json();
+                message = "Item successfully purchased!";
+                status = "success";
+                showPopup = true;
+            } else {
+                message = "There was an issue purchasing the item.";
+                status = "error";
+                showPopup = true;
+            }
+        }
+    }
 </script>
 
 <body
@@ -118,8 +160,10 @@
 >
     <Navbar />
     <header class="flex items-center justify-between w-full p-6 bg-dark_blue">
-        <div class="flex-1"></div>
-        <h1 class="text-white font-title font-semibold text-2xl flex-1">Market</h1>
+        <div class="flex-1" />
+        <h1 class="text-white font-title font-semibold text-2xl flex-1">
+            Market
+        </h1>
         <div class="flex items-center text-white font-headers font-semibold">
             <p>You have {user.coins} coins</p>
         </div>
@@ -150,6 +194,77 @@
             class="bg-ugreen hover:bg-green-800 text-white py-2 px-4 rounded w-full"
             on:click={buyEgg}>Buy Egg</button
         >
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-4">
+        {#each listings as listing}
+            {#if listing.sold == false}
+                <div class="bg-white p-4 rounded shadow-md text-center w-64">
+                    <img
+                        src={listing.image}
+                        alt={listing.name}
+                        class="w-48 h-48 mx-auto mb-4 border-b"
+                    />
+                    <ul class="listing-info list-none pl-0 mb-4">
+                        <li
+                            class="flex justify-between border-b border-gray-200 pb-2"
+                        >
+                            <p class="capitalize font-body font-semibold">Item:</p>
+                            <p class="capitalize font-body font-semibold">
+                                {listing.listing_name}
+                            </p>
+                        </li>
+                        {#if listing.item_type != "egg"}
+                        <li
+                            class="flex justify-between border-b border-gray-200 pb-2"
+                        >
+                            <p class="capitalize font-body font-semibold">Name:</p>
+                            <p class="capitalize font-body font-semibold">
+                                {listing.name}
+                            </p>
+                        </li>
+                        {/if}
+                        <li
+                            class="flex justify-between border-b border-gray-200 pb-2"
+                        >
+                            <p class="capitalize font-body font-semibold">Rarity:</p>
+                            <p class="capitalize font-body font-semibold">
+                                {listing.rarity}
+                            </p>
+                        </li>
+                        <li
+                            class="flex justify-between border-b border-gray-200 pb-2"
+                        >
+                            <p class="capitalize font-body font-semibold">Owner:</p>
+                            <p class="capitalize font-body font-semibold">
+                                {listing.username}
+                            </p>
+                        </li>
+
+                        {#if listing.item_type != "egg"}
+                        <li
+                            class="flex justify-between border-b border-gray-200 pb-2"
+                        >
+                            <p class="capitalize font-body font-semibold">Yield Rate:</p>
+                            <p class="capitalize font-body font-semibold">
+                                {listing.yield_rate}
+                            </p>
+                        </li>
+                        {/if}
+                        <li class="flex justify-between pt-2">
+                            <p class="font-body font-semibold">Price:</p>
+                            <p class="font-body font-semibold">
+                                {listing.price} coins
+                            </p>
+                        </li>
+                    </ul>
+                    <button
+                        class="bg-ugreen hover:bg-green-800 text-white py-2 px-4 rounded w-full"
+                        on:click={() => buyListing(listing)}>Buy Item</button
+                    >
+                </div>
+            {/if}
+        {/each}
     </div>
 
     <div class="flex justify-center mb-4">

@@ -1,7 +1,7 @@
 # routes.py
 from flask import Blueprint, jsonify, request, make_response
 from __init__ import db
-from models import User, Animal, Egg
+from models import User, Animal, Egg, MarketListing
 import re
 import classes as animal_logic
 import time
@@ -21,8 +21,14 @@ def hello():
 @main.route('/api/view_users')
 def view_users():
     users = User.query.all()
-    user_list = [{'id': user.id, 'username': user.username, 'email': user.email, 'password': user.password} for user in users]
+    user_list = [{'id': user.id, 'username': user.username, 'email': user.email, 'password': user.password, "coin": user.coins} for user in users]
     return jsonify({'users': user_list})
+
+@main.route("/api/view_listings")
+def view_listings():
+    listings = MarketListing.query.all()
+    listing_list = [{'id': listing.id, 'item_id': listing.item_id, 'price': listing.price} for listing in listings]
+    return jsonify({'listings': listing_list})
 
 @main.route('/register', methods=['POST'])
 def register():
@@ -194,6 +200,52 @@ def buy_egg(username):
 
     return jsonify(user.to_dict()), 200
 
+@main.route('/api/buy_listing/<string:username>', methods=['POST'])
+def buy_listing(username):
+    user = User.query.filter_by(username=username).first()
+    
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    listing_data = request.get_json()
+
+    if user.coins < listing_data['price']:
+        return jsonify({"error": "Insufficient coins"}), 400
+
+    # Subtract listing cost from user's coins
+    user.coins -= listing_data['price']
+
+    # Checl if egg or animal
+    if listing_data['item_type'] == 'egg':
+        item = Egg.query.filter_by(id=listing_data['item_id']).first()
+    else:
+        item = Animal.query.filter_by(id=listing_data['item_id']).first()
+
+    if not item:
+        return jsonify({"error": "Item not found"}), 404
+    
+    # Add listing cost to seller's coins
+    seller = User.query.filter_by(id=listing_data['user_id']).first()
+    seller.coins += listing_data['price']
+
+    # Transfer item to buyer
+    item.user_id = user.id
+
+    if listing_data['item_type'] == 'egg':
+        item.owner.eggs.remove(item)
+        user.eggs.append(item)
+    else:
+        item.owner.animals.remove(item)
+        user.animals.append(item)
+
+    # Change listing status to sold
+    listing = MarketListing.query.filter_by(id=listing_data['id']).first()
+    listing.sold = True
+    # Commit changes to database
+    db.session.commit()
+
+    return jsonify(user.to_dict()), 200
+
 @main.route('/api/user/<string:username>/eggs', methods=['GET'])
 def get_eggs(username):
     user = User.query.filter_by(username=username).first()
@@ -316,6 +368,70 @@ def breed_animals():
         return jsonify({'status': 'success', 'message': 'Animals bred successfully', 'animal': new_animal.to_dict()}), 200
     else:
         return jsonify({'status': 'error', 'message': 'One or more animals not found.'}), 404
+    
+@main.route("/api/market_listing", methods=["POST"])
+def list_on_market():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    username = User.query.filter_by(id=user_id).first().username
+    item_id = data.get('item_id')
+    listing_name = data.get('listing_name')
+    item_type = data.get('item_type')
+    price = data.get('price')
+
+    if item_type == 'egg':
+        item = Egg.query.filter_by(id=item_id, user_id=user_id).first()
+    elif item_type == 'animal':
+        item = Animal.query.filter_by(id=item_id, user_id=user_id).first()
+
+    if not item:
+        response = {"status": "error", "message": "Item does not belong to user."}
+        return jsonify(response)
+
+
+    # Change the owner of the item to the escrow user
+    escrow_user = User.query.filter_by(id=1).first()
+    if item_type == 'egg':
+        item.user_id = 1
+        item.owner.eggs.remove(item)
+        escrow_user.eggs.append(item)
+        image = "https://ichef.bbci.co.uk/news/976/cpsprodpb/7614/production/_105482203__105172250_gettyimages-857294664.jpg"
+        name = "Egg"
+        yield_rate = 0
+    elif item_type == 'animal':
+        item.user_id = 1
+        item.owner.animals.remove(item)
+        escrow_user.animals.append(item)
+        image = item.image_url
+        name = item.name
+        yield_rate = item.coin_yield
+
+    rarity = item.rarity
+
+    new_listing = MarketListing (
+        user_id=user_id,
+        username=username,
+        image=image,
+        name=name,
+        item_id=item_id,
+        listing_name=listing_name,
+        item_type=item_type,
+        price=price,
+        rarity=rarity,
+        yield_rate=yield_rate
+    )
+
+    db.session.add(new_listing)
+    db.session.commit()
+
+    response = {"status": "success", "message": "Item listed on market."}
+    return jsonify(response)
+
+@main.route("/api/listings", methods=["GET"])
+def get_listings():
+    listings = MarketListing.query.all()
+    listings = [listing.to_dict() for listing in listings]
+    return jsonify(listings)
 
 # ?? helper functions
 
@@ -383,7 +499,3 @@ def generate_session_id():
     
     # Return the hashed session ID
     return hash_hex
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=update_coins, trigger="interval", minutes=5)
-scheduler.start()
