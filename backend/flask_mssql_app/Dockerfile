@@ -1,4 +1,4 @@
-#Set the base image
+# Set the base image
 FROM python:3.10-slim-buster
 
 # Set the working directory

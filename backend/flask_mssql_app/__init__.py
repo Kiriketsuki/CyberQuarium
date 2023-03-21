@@ -31,10 +31,3 @@ def create_app():
     app.register_blueprint(main)
 
     return app
-
-def log_request(app):
-    def before_request():
-        print(f"Request: {request.method} {request.url}")
-
-    app.before_request(before_request)
-    return app

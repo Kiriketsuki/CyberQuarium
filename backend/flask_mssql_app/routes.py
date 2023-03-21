@@ -59,7 +59,8 @@ def register():
         return jsonify(response)
 
     # Perform user registration logic here
-    new_user = User(username=email.split('@')[0], email=email, password=password)
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    new_user = User(username=email.split('@')[0], email=email, password=hashed_password)
     session_id = generate_session_id()
     new_user.session_id = session_id
     db.session.add(new_user)
@@ -69,6 +70,7 @@ def register():
     response = {"status": "success", "message": message}
     return jsonify(response)
 
+
 @main.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -76,9 +78,16 @@ def login():
     email = data.get('email')
     password = data.get('password')
 
+    if not is_strong_password(password):
+        response = {
+            "status": "error",
+            "message": "Try logging in with Google instead.",
+        }
+        return jsonify(response)
+
     # Check if user exists in the database and password matches
     user = User.query.filter_by(email=email).first()
-    if user and user.password == password:
+    if user and user.password == hashlib.sha256(password.encode()).hexdigest():
         # Check if user has an active session stored in the database
         print(user.session_id == None)
 
@@ -91,6 +100,7 @@ def login():
     else:
         response = {"status": "error", "message": "Invalid email or password."}
         return jsonify(response)
+
     
 @main.route('/google', methods=['POST'])
 def google():
@@ -350,7 +360,7 @@ def breed_animals():
         new_name = merge_words(animal_1.name, animal_2.name)
 
         # Breed the animals
-        breeder = animal_logic.Breeder("breeder")
+        breeder = Breeder("breeder")
         breeder.add_animal(animal_1)
         breeder.add_animal(animal_2)
         new_animal = breeder.breed(animal1.id, animal2.id)
