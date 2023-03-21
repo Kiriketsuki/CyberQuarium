@@ -94,13 +94,15 @@ class Animal:
     def create_image(self):
         # Create an image of the animal
         prompt = f"{self.rarity} {self.species} called {self.name}"
+        api_key  = os.environ.get('IMAGE_API_KEY')
+        print(api_key)
         res = requests.post(
             "https://api.deepai.org/api/text2img",
             data={
                 'text': prompt,
                 'grid_size': '1',
             },
-            headers={'api-key': os.environ.get('IMAGE_API_KEY')}
+            headers={'api-key': api_key}
         )
         url = res.json()['output_url']
         return url

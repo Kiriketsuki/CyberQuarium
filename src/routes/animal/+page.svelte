@@ -5,7 +5,7 @@
     onMount(async () => {
         const params = new URLSearchParams(window.location.search);
         var animalId = params.get("id");
-        const response = await fetch(`http://localhost:5000/api/animal`, {
+        const response = await fetch(`https://cqflask-v3to2tehtq-lz.a.run.app/api/animal`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -18,7 +18,7 @@
         animal.dob = formatDate(animal.dob);
         if (response.ok) {
             console.log(animal);
-            const res = await fetch(`http://localhost:5000/api/update-coins`);
+            const res = await fetch(`https://cqflask-v3to2tehtq-lz.a.run.app/api/update-coins`);
         } else {
             window.location.href = "/inventory";
         }

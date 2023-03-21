@@ -24,7 +24,7 @@
         console.log(sessionid, username)
 
         // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
-        var response = await fetch("http://localhost:5000/api/session", {
+        var response = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/api/session", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -38,7 +38,7 @@
         if (response.ok) {
             // If the sessionid is valid, get the user from the database
             var response = await fetch(
-                `http://localhost:5000/api/user/${username}`
+                `https://cqflask-v3to2tehtq-lz.a.run.app/api/user/${username}`
             );
 
             if (response.ok) {

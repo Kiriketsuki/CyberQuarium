@@ -21,12 +21,12 @@
         username = user.username;
 
         const eggsResponse = await fetch(
-            `http://localhost:5000/api/user/${username}/eggs`
+            `https://cqflask-v3to2tehtq-lz.a.run.app/api/user/${username}/eggs`
         );
         eggs = await eggsResponse.json();
 
         const animalsResponse = await fetch(
-            `http://localhost:5000/api/user/${username}/animals`
+            `https://cqflask-v3to2tehtq-lz.a.run.app/api/user/${username}/animals`
         );
         animals = await animalsResponse.json();
         refreshYields(false);
@@ -46,7 +46,7 @@
         console.log(sessionid, username);
 
         // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
-        var response = await fetch("http://localhost:5000/api/session", {
+        var response = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/api/session", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -60,7 +60,7 @@
         if (response.ok) {
             // If the sessionid is valid, get the user from the database
             var response = await fetch(
-                `http://localhost:5000/api/user/${username}`
+                `https://cqflask-v3to2tehtq-lz.a.run.app/api/user/${username}`
             );
 
             if (response.ok) {
@@ -86,7 +86,7 @@
             return;
         }
 
-        const response = await fetch("http://localhost:5000/hatch", {
+        const response = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/hatch", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -108,7 +108,7 @@
     async function refreshYields(show) {
         isLoading = true;
         showPopup = show;
-        const response = await fetch(`http://localhost:5000/api/update-coins`);
+        const response = await fetch(`https://cqflask-v3to2tehtq-lz.a.run.app/api/update-coins`);
 
         if (response.ok) {
             var res = await response.json();
@@ -125,7 +125,7 @@
 
     async function burnAnimal(animalId) {
         isLoading = true;
-        const response = await fetch("http://localhost:5000/api/burn_animal", {
+        const response = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/api/burn_animal", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -183,7 +183,7 @@
     async function breedAnimals() {
         isLoading = true;
         const response = await fetch(
-            "http://localhost:5000/api/breed_animals",
+            "https://cqflask-v3to2tehtq-lz.a.run.app/api/breed_animals",
             {
                 method: "POST",
                 headers: {
@@ -231,7 +231,7 @@
 
             try {
                 const response = await fetch(
-                    "http://localhost:5000/api/market_listing",
+                    "https://cqflask-v3to2tehtq-lz.a.run.app/api/market_listing",
                     {
                         method: "POST",
                         headers: {

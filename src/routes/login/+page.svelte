@@ -22,7 +22,7 @@
         };
 
         const response = await fetch(
-            "http://localhost:5000/login",
+            "https://cqflask-v3to2tehtq-lz.a.run.app/login",
             requestOptions
         );
         const result = await response.json();
@@ -50,7 +50,7 @@
             if (result) {
                 user = result.user;
                 var username = user.email.split("@")[0];
-                const response = await fetch("http://localhost:5000/google", {
+                const response = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/google", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
