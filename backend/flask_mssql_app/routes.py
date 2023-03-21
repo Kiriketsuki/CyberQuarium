@@ -24,6 +24,8 @@ def view_users():
     user_list = [{'id': user.id, 'username': user.username, 'email': user.email, 'password': user.password} for user in users]
     return jsonify({'users': user_list})
 
+import hashlib
+
 @main.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -54,7 +56,8 @@ def register():
         return jsonify(response)
 
     # Perform user registration logic here
-    new_user = User(username=email.split('@')[0], email=email, password=password)
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    new_user = User(username=email.split('@')[0], email=email, password=hashed_password)
     session_id = generate_session_id()
     new_user.session_id = session_id
     db.session.add(new_user)
@@ -64,6 +67,7 @@ def register():
     response = {"status": "success", "message": message}
     return jsonify(response)
 
+
 @main.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -71,9 +75,16 @@ def login():
     email = data.get('email')
     password = data.get('password')
 
+    if not is_strong_password(password):
+        response = {
+            "status": "error",
+            "message": "Try logging in with Google instead.",
+        }
+        return jsonify(response)
+
     # Check if user exists in the database and password matches
     user = User.query.filter_by(email=email).first()
-    if user and user.password == password:
+    if user and user.password == hashlib.sha256(password.encode()).hexdigest():
         # Check if user has an active session stored in the database
         print(user.session_id == None)
 
@@ -86,6 +97,7 @@ def login():
     else:
         response = {"status": "error", "message": "Invalid email or password."}
         return jsonify(response)
+
     
 @main.route('/google', methods=['POST'])
 def google():

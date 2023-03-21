@@ -6,3 +6,4 @@ pyodbc
 requests
 nltk
 g2p_en
+autopep8
