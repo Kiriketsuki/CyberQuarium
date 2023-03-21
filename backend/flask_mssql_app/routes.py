@@ -5,6 +5,7 @@ from .models import User, Animal, Egg, MarketListing
 import re
 from .classes import Animal as AnimalClass
 from .classes import Egg as EggClass
+from .classes import Breeder as BreederClass
 import time
 from .name_merger import merge_words
 import uuid
@@ -360,7 +361,7 @@ def breed_animals():
         new_name = merge_words(animal_1.name, animal_2.name)
 
         # Breed the animals
-        breeder = Breeder("breeder")
+        breeder = BreederClass("breeder")
         breeder.add_animal(animal_1)
         breeder.add_animal(animal_2)
         new_animal = breeder.breed(animal1.id, animal2.id)

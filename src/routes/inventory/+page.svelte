@@ -378,7 +378,7 @@
     {#if showBreedButton}
         <button
             on:click={breedAnimals}
-            class="mx-auto mt-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            class="mx-auto mt-4 mb-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
             >Breed Animals</button
         >
     {/if}
