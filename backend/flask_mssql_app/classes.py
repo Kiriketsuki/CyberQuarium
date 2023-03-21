@@ -2,14 +2,15 @@
 import random
 import time
 import requests
-from .config import image_api_key
+# from .config import image_api_key
+import os
 
 rarity = ['common', 'uncommon', 'rare', 'epic', 'legendary']
 species = ['Fish', 'Mammal', 'Reptile', 'Amphibian']
 fish_names = ["Salmon", "Tuna", "Grouper", "Herring", "Carp", "Cod", "Catfish", "Hammerhead Shark", "Great White Shark", "Megalodon"]
-mammal_names = ["Walrus", "Sea Otter", "Seal", "Sea Lion", "Orca", "Sperm Whale", "Humpback Whale"]
-reptile_names = ["Sea Turtle", "Alligator", "Crocodile"]
-amphibian_names = ["Frog", "Toad", "Salamander", "Newt"]
+mammal_names = ["Walrus", "Sea Otter", "Seal", "Sea Lion", "Orca", "Sperm Whale", "Humpback Whale", "Dolphin", "Porpoise", "Beluga Whale", "Gray Whale"]
+reptile_names = ["Sea Turtle", "Alligator", "Crocodile", "Spectacled Caiman", "Green Anaconda", "Saltwater Crocodile"]
+amphibian_names = ["Frog", "Toad", "Salamander", "Newt", "Caecilian", "Axolotl", "Fire-bellied toad"]
 
 # ? Animal class is used to create an animal hatched from an egg
 class Animal:
@@ -62,15 +63,15 @@ class Animal:
         # The probability of getting each rarity is 50%, 30%, 15%, 4%, 1% respectively
         match self.rarity:
             case 'common':
-                self.coin_yield = random.randint(0, 10) + 50/50 * 20
+                self.coin_yield = random.randint(0, 10) + 50/50 * 5
             case 'uncommon':
-                self.coin_yield = random.randint(0, 20) + 50/30 * 20
+                self.coin_yield = random.randint(0, 20) + 40/30 * 10
             case 'rare':
-                self.coin_yield = random.randint(0, 30) + 50/15 * 20
+                self.coin_yield = random.randint(0, 30) + 30/15 * 12.5
             case 'epic':
-                self.coin_yield = random.randint(0, 40) + 50/4 * 20
+                self.coin_yield = random.randint(0, 40) + 20/4 * 17.5
             case 'legendary':
-                self.coin_yield = random.randint(0, 50) + 50/1 * 20
+                self.coin_yield = random.randint(0, 50) + 10/1 * 20
 
     def update_yielded_coins(self):
         # Get current time
@@ -99,7 +100,7 @@ class Animal:
                 'text': prompt,
                 'grid_size': '1',
             },
-            headers={'api-key': image_api_key}
+            headers={'api-key': os.environ.get('IMAGE_API_KEY')}
         )
         url = res.json()['output_url']
         return url
