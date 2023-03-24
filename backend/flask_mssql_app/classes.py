@@ -94,17 +94,19 @@ class Animal:
     def create_image(self):
         # Create an image of the animal
         prompt = f"{self.rarity} {self.species} called {self.name}"
-        api_key  = os.environ.get('IMAGE_API_KEY')
-        print(api_key)
-        res = requests.post(
-            "https://api.deepai.org/api/text2img",
-            data={
-                'text': prompt,
-                'grid_size': '1',
-            },
-            headers={'api-key': api_key}
-        )
-        url = res.json()['output_url']
+        try:
+            api_key  = os.environ.get('IMAGE_API_KEY')
+            res = requests.post(
+                "https://api.deepai.org/api/text2img",
+                data={
+                    'text': prompt,
+                    'grid_size': '1',
+                },
+                headers={'api-key': api_key}
+            )
+            url = res.json()['output_url']
+        except:
+            url = "https://www.gannett-cdn.com/presto/2022/10/24/USAT/6253d26d-8894-4a38-87ee-6c2f37b1c0d2-7._Miroslav-Srb_Hello-everyone_00001567.jpg?crop=2999,1687,x0,y300&width=1600&height=800&format=pjpg&auto=webp"
         return url
 
         

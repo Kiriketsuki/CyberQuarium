@@ -13,22 +13,29 @@ import hashlib
 
 main = Blueprint('main', __name__)
 
+
 @main.route('/')
 def hello():
     return 'Hello, World!'
 
 # route to view all users and all info
+
+
 @main.route('/api/view_users')
 def view_users():
     users = User.query.all()
-    user_list = [{'id': user.id, 'username': user.username, 'email': user.email, 'password': user.password, "coin": user.coins} for user in users]
+    user_list = [{'id': user.id, 'username': user.username, 'email': user.email,
+                  'password': user.password, "coin": user.coins} for user in users]
     return jsonify({'users': user_list})
+
 
 @main.route("/api/view_listings")
 def view_listings():
     listings = MarketListing.query.all()
-    listing_list = [{'id': listing.id, 'item_id': listing.item_id, 'price': listing.price} for listing in listings]
+    listing_list = [{'id': listing.id, 'item_id': listing.item_id,
+                     'price': listing.price, 'username': listing.username} for listing in listings]
     return jsonify({'listings': listing_list})
+
 
 @main.route('/register', methods=['POST'])
 def register():
@@ -56,12 +63,14 @@ def register():
     # Check if user already exists in the database
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
-        response = {"status": "error", "message": "User with this email address already exists."}
+        response = {"status": "error",
+                    "message": "User with this email address already exists."}
         return jsonify(response)
 
     # Perform user registration logic here
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    new_user = User(username=email.split('@')[0], email=email, password=hashed_password)
+    new_user = User(username=email.split(
+        '@')[0], email=email, password=hashed_password)
     session_id = generate_session_id()
     new_user.session_id = session_id
     db.session.add(new_user)
@@ -96,13 +105,14 @@ def login():
         session_id = generate_session_id()
         user.session_id = session_id
         db.session.commit()
-        response = {"status": "success", "message": "User logged in successfully.", "sessionID": session_id}
+        response = {"status": "success",
+                    "message": "User logged in successfully.", "sessionID": session_id}
         return jsonify(response)
     else:
         response = {"status": "error", "message": "Invalid email or password."}
         return jsonify(response)
 
-    
+
 @main.route('/google', methods=['POST'])
 def google():
     data = request.get_json()
@@ -115,7 +125,8 @@ def google():
         session_id = generate_session_id()
         user.session_id = session_id
         db.session.commit()
-        response = {"status": "success", "message": "User logged in successfully.", "sessionID": session_id}
+        response = {"status": "success",
+                    "message": "User logged in successfully.", "sessionID": session_id}
         return jsonify(response)
     else:
         new_user = User(username=username, email=email)
@@ -123,24 +134,29 @@ def google():
         new_user.session_id = session_id
         db.session.add(new_user)
         db.session.commit()
-        response = {"status": "success", "message": "User logged in successfully.", "sessionID": session_id}
+        response = {"status": "success",
+                    "message": "User logged in successfully.", "sessionID": session_id}
         return jsonify(response)
-    
+
+
 @main.route('/logout', methods=['POST'])
 def logout():
     data = request.get_json()
     username = data.get('username')
-    user = User.query.filter_by(username = username).first()
+    user = User.query.filter_by(username=username).first()
     if user:
         user.session_id = None
         db.session.commit()
-        response = {"status": "success", "message": "User logged out successfully."}
+        response = {"status": "success",
+                    "message": "User logged out successfully."}
         return jsonify(response)
     else:
         response = {"status": "error", "message": "User not found."}
         return jsonify(response)
-    
+
 # Create an API endpoint which receives a username and sessionid and checks if the session is valid
+
+
 @main.route('/api/session', methods=['POST'])
 def check_session():
     data = request.get_json()
@@ -157,7 +173,7 @@ def check_session():
         if user.session_id == sessionID:
             response = {"status": "success", "message": "Session is valid."}
             return jsonify(response)
-        
+
     response = {"status": "error", "message": "Session is invalid."}
     return jsonify(response)
 
@@ -183,10 +199,11 @@ def create_egg():
     egg = EggClass()
     return jsonify({"rarity": egg.get_rarity(), "cost": egg.get_cost()})
 
+
 @main.route('/api/buy_egg/<string:username>', methods=['POST'])
 def buy_egg(username):
     user = User.query.filter_by(username=username).first()
-    
+
     if not user:
         return jsonify({"error": "User not found"}), 404
 
@@ -210,10 +227,11 @@ def buy_egg(username):
 
     return jsonify(user.to_dict()), 200
 
+
 @main.route('/api/buy_listing/<string:username>', methods=['POST'])
 def buy_listing(username):
     user = User.query.filter_by(username=username).first()
-    
+
     if not user:
         return jsonify({"error": "User not found"}), 404
 
@@ -233,7 +251,7 @@ def buy_listing(username):
 
     if not item:
         return jsonify({"error": "Item not found"}), 404
-    
+
     # Add listing cost to seller's coins
     seller = User.query.filter_by(id=listing_data['user_id']).first()
     seller.coins += listing_data['price']
@@ -251,10 +269,12 @@ def buy_listing(username):
     # Change listing status to sold
     listing = MarketListing.query.filter_by(id=listing_data['id']).first()
     listing.sold = True
+    listing.status = 'Sold'
     # Commit changes to database
     db.session.commit()
 
     return jsonify(user.to_dict()), 200
+
 
 @main.route('/api/user/<string:username>/eggs', methods=['GET'])
 def get_eggs(username):
@@ -266,6 +286,7 @@ def get_eggs(username):
     eggs = [egg.to_dict() for egg in user.eggs]
     return jsonify(eggs), 200
 
+
 @main.route('/api/user/<string:username>/animals', methods=['GET'])
 def get_animals(username):
     user = User.query.filter_by(username=username).first()
@@ -275,6 +296,7 @@ def get_animals(username):
 
     animals = [animal.to_dict() for animal in user.animals]
     return jsonify(animals), 200
+
 
 @main.route('/hatch', methods=['POST'])
 def hatch():
@@ -292,7 +314,6 @@ def hatch():
     if not user or not egg:
         return jsonify({"error": "User or egg not found"}), 404
 
-    
     # Delete the egg and add the new animal to the database
     db.session.delete(egg)
     animal = animal_class_to_model(animal, user.id)
@@ -303,18 +324,19 @@ def hatch():
     return jsonify(animal.to_dict()), 200
 
 
-@main.route('/api/update-coins')
+@main.route('/api/update_coins')
 def update_coins():
     current_time = time.time()
     animals = Animal.query.all()
-    
+
     for animal in animals:
         elapsed_time = current_time - animal.dob
         elapsed_minutes = elapsed_time // 60
         animal.coins_yielded = elapsed_minutes * animal.coin_yield / 60
         db.session.commit()
-    
+
     return {'status': 'success'}, 200
+
 
 @main.route('/api/burn_animal', methods=['POST'])
 def burn_animal():
@@ -343,6 +365,7 @@ def burn_animal():
             return jsonify({'status': 'error', 'message': 'User not found.'}), 404
     else:
         return jsonify({'status': 'error', 'message': 'Animal not found.'}), 404
+
 
 @main.route('/api/breed_animals', methods=['POST'])
 def breed_animals():
@@ -378,7 +401,8 @@ def breed_animals():
         return jsonify({'status': 'success', 'message': 'Animals bred successfully', 'animal': new_animal.to_dict()}), 200
     else:
         return jsonify({'status': 'error', 'message': 'One or more animals not found.'}), 404
-    
+
+
 @main.route("/api/market_listing", methods=["POST"])
 def list_on_market():
     data = request.get_json()
@@ -395,9 +419,9 @@ def list_on_market():
         item = Animal.query.filter_by(id=item_id, user_id=user_id).first()
 
     if not item:
-        response = {"status": "error", "message": "Item does not belong to user."}
+        response = {"status": "error",
+                    "message": "Item does not belong to user."}
         return jsonify(response)
-
 
     # Change the owner of the item to the escrow user
     escrow_user = User.query.filter_by(id=1).first()
@@ -418,7 +442,7 @@ def list_on_market():
 
     rarity = item.rarity
 
-    new_listing = MarketListing (
+    new_listing = MarketListing(
         user_id=user_id,
         username=username,
         image=image,
@@ -428,7 +452,8 @@ def list_on_market():
         item_type=item_type,
         price=price,
         rarity=rarity,
-        yield_rate=yield_rate
+        yield_rate=yield_rate,
+        status="Listed"
     )
 
     db.session.add(new_listing)
@@ -437,11 +462,81 @@ def list_on_market():
     response = {"status": "success", "message": "Item listed on market."}
     return jsonify(response)
 
+
 @main.route("/api/listings", methods=["GET"])
 def get_listings():
     listings = MarketListing.query.all()
     listings = [listing.to_dict() for listing in listings]
     return jsonify(listings)
+
+
+@main.route("/api/user_listings", methods=["POST"])
+def get_user_listings():
+    data = request.get_json()
+    username = data.get('username')
+    user = User.query.filter_by(username=username).first()
+    if user:
+        listings = MarketListing.query.filter_by(username=username).all()
+        listings = [listing.to_dict() for listing in listings]
+        return jsonify(listings)
+    else:
+        return jsonify({"status": "error", "message": "User not found."})
+
+
+@main.route("/api/update_listing", methods=["POST"])
+def update_listing():
+    data = request.get_json()
+    listing_id = data.get('id')
+    listing_name = data.get('listing_name')
+    price = data.get('price')
+
+    listing = MarketListing.query.filter_by(id=listing_id).first()
+    if listing:
+        listing.listing_name = listing_name
+        listing.price = price
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Listing updated."})
+    else:
+        return jsonify({"status": "error", "message": "Listing not found."})
+
+
+@main.route("/api/cancel_listing", methods=["POST"])
+def cancel_listing():
+    data = request.get_json()
+    listing_id = data.get('id')
+    user_id = data.get('user_id')
+    listing = MarketListing.query.filter_by(id=listing_id).first()
+    user = User.query.filter_by(id=user_id).first()
+
+    if not listing:
+        return jsonify({"status": "error", "message": "Listing not found."})
+
+    if not user:
+        return jsonify({"status": "error", "message": "User not found."})
+
+    if listing.user_id != user_id:
+        return jsonify({"status": "error", "message": "User does not own listing."})
+
+    item_type = listing.item_type
+    if item_type == 'egg':
+        item = Egg.query.filter_by(id=listing.item_id).first()
+    else:
+        item = Animal.query.filter_by(id=listing.item_id).first()
+
+    if item_type == 'egg':
+        item.user_id = user_id
+        item.owner.eggs.remove(item)
+        user.eggs.append(item)
+    elif item_type == 'animal':
+        item.user_id = user_id
+        item.owner.animals.remove(item)
+        user.animals.append(item)
+
+    listing.status = 'Cancelled'
+
+    db.session.commit()
+    return jsonify({"status": "success", "message": "Listing cancelled."})
+
 
 @main.route("/api/animal", methods=["POST"])
 def get_animal():
@@ -458,16 +553,33 @@ def get_animal():
     else:
         return jsonify({"status": "error", "message": "Animal not found."})
 
+
+@main.route("/api/update_nickname", methods=["POST"])
+def update_nickname():
+    data = request.get_json()
+    animal_id = data.get('animal_id')
+    nickname = data.get('nickname')
+    animal = Animal.query.filter_by(id=animal_id).first()
+    if animal:
+        animal.nickname = nickname
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Nickname updated."})
+    else:
+        return jsonify({"status": "error", "message": "Animal not found."})
+
 # ?? helper functions
+
 
 def is_valid_email(email):
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(email_regex, email)
 
+
 def is_strong_password(password):
     # At least 8 characters, with uppercase, lowercase, digit, and special character
     password_regex = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
     return re.match(password_regex, password)
+
 
 def animal_class_to_model(animal_class, user_id):
     return Animal(
@@ -481,6 +593,7 @@ def animal_class_to_model(animal_class, user_id):
         user_id=user_id,
     )
 
+
 def animal_model_to_class(animal_model):
     return create_animal(
         animal_model.id,
@@ -491,6 +604,7 @@ def animal_model_to_class(animal_model):
         animal_model.coin_yield,
         animal_model.coins_yielded,
     )
+
 
 def create_animal(id, dob, rarity, species, name, coin_yield, coins_yielded):
     animal = AnimalClass(rarity, species, name, coin_yield)
@@ -503,7 +617,7 @@ def create_animal(id, dob, rarity, species, name, coin_yield, coins_yielded):
 def get_coin_update():
     current_time = time.time()
     animals = Animal.query.all()
-    
+
     for animal in animals:
         elapsed_time = current_time - animal.dob
         elapsed_minutes = elapsed_time // 60
@@ -517,10 +631,10 @@ def generate_session_id():
     """
     # Generate a random UUID as the session ID
     session_id = str(uuid.uuid4())
-    
+
     # Generate a hash of the session ID using SHA-256 for added security
     hash_object = hashlib.sha256(session_id.encode())
     hash_hex = hash_object.hexdigest()
-    
+
     # Return the hashed session ID
     return hash_hex

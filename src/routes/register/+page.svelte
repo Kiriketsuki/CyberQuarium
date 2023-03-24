@@ -18,7 +18,7 @@
             if (result) {
                 user = result.user;
                 var username = user.email.split('@')[0];
-                const response = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/google", {
+                const response = await fetch("http://localhost:5000/google", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -46,7 +46,7 @@
         const confirmPassword = formData.get("confirmPassword");
 
         // Replace this with your registration API endpoint
-        const apiUrl = "https://cqflask-v3to2tehtq-lz.a.run.app/register";
+        const apiUrl = "http://localhost:5000/register";
 
         const response = await fetch(apiUrl, {
             method: "POST",

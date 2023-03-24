@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Lab 2 - Calculator</title>
+	<script>
+		function to_run() {
+            var body = document.getElementsByTagName("body")[0];
+            var div = document.createElement("div");
+            var list = document.createElement("ul");
+            list.style.listStyleType = "none";
+            body.appendChild(div);
+            div.appendChild(list);
+
+            var result_span = document.getElementById("result");
+            var form = document.getElementById("calculatorForm");
+            form.addEventListener("submit", (e) => {
+                var operator = document.getElementById("operation").value;
+                var operand1 = document.getElementById("operand1").value;
+                var operand2 = document.getElementById("operand2").value;
+                e.preventDefault();
+                if (operand1 == "") {
+                    operand1 = 0;
+                }
+
+                if (operand2 == "") {
+                    operand2 = 0;
+                }
+
+                var result = math(operand1, operand2, operator);
+                
+                result_span.innerHTML = result;
+
+                var li = document.createElement("li");
+                switch (operator) {
+                    case "add":
+                        operator = "+";
+                        break;
+                    case "sub":
+                        operator = "-";
+                        break;
+                    case "mul":
+                        operator = "*";
+                        break;
+                    case "div":
+                        operator = "/";
+                        break;
+                }
+
+                li.innerHTML = operand1 + " " + operator + " " + operand2 + " = " + result;
+                li.addEventListener("click", () => {
+                    var innerHTML = li.innerHTML;
+                    var operands = innerHTML.split(" ");
+                    document.getElementById("operand1").value = operands[0];
+                    document.getElementById("operand2").value = operands[2];
+                    
+                    operator = operands[1];
+
+                    var options = document.getElementById("operation").options;
+                    for (var i = 0; i < options.length; i++) {
+                        if (options[i].innerHTML == operator) {
+                            document.getElementById("operation").selectedIndex = i;
+                            break;
+                        }
+                    }
+                    
+                })
+                list.appendChild(li);
+            })
+        }
+
+        function math(operand1, operand2, operator) {
+            // convert to numbers
+            operand1 = Number(operand1);
+            operand2 = Number(operand2);
+            switch (operator) {
+                case "add":
+                    return operand1 + operand2;
+                case "sub":
+                    return operand1 - operand2;
+                case "mul":
+                    return operand1 * operand2;
+                case "div":
+                    try {
+                        return operand1 / operand2;
+                    } catch (e) {
+                        alert("Cannot divide by zero");
+                    }
+            }
+        }
+		// Write your JavaScript code here.
+		// The result of the computation should be shown in the span element.
+		// Want a harder challenge? Also show a list with previously carried
+		// out operations and what the result was. Clicking on one of them,
+		// auto fills the form with that operation.
+		
+        window.onload = to_run;
+	</script>
+</head>
+<body>
+	
+	<h1>Calculator</h1>
+	
+	<form id="calculatorForm" method="GET">
+		
+		<input type="number" id="operand1" name="operand1">
+		
+		<select id="operation" name="operation">
+			<option value="add">+</option>
+			<option value="sub">-</option>
+			<option value="mul">*</option>
+			<option value="div">/</option>
+		</select>
+		
+		<input type="number" id="operand2" name="operand2">
+		
+		<input type="submit" value="=">
+		
+		<span id="result">?</span>
+		
+	</form>
+	
+</body>
+</html>

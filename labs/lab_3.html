@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Lab 3 - Validating Forms</title>
+	<script>
+		function to_run() {
+            var form = document.getElementById("createAccountForm");
+            var error_message = document.createElement("div");
+            form.append(error_message);
+            
+            form.addEventListener("submit", (e) => {
+                var email = document.getElementById("email").value;
+                var password1 = document.getElementById("password1").value;
+                var password2 = document.getElementById("password2").value;
+                
+
+                
+                // deal with email
+                if (validate_email(email)) {
+                    console.log("Email is valid");
+                } else {
+                    error_message.innerHTML = "Enter a valid email. The required format is any combination of letters, numbers, and the following characters: . _ % + - @, followed by an @ symbol, followed by any combination of letters, numbers, and the following characters: . -, followed by a period, followed by any combination of letters.";
+                    e.preventDefault();
+                    return;
+                }
+
+                // deal with password strength
+                if (password_strength(password1)) {
+                    // deal with password matching
+                    if (password1 === password2) {
+                        return;
+                    } else {
+                        error_message.innerHTML = "Passwords do not match";
+                        e.preventDefault();
+                        return;
+                    }
+                } else {
+                    error_message.innerHTML = "Password must be between 8 and 32 characters long, and must contain at least one lowercase letter, one uppercase letter, one number, and one special character.";
+                    e.preventDefault();
+                    return;
+                }
+                e.preventDefault();
+                
+            });
+        }
+
+        function validate_email(email) {
+            var re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return re.test(email);
+        }
+
+        function password_strength(pass) {
+            var re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_=+{}[\]|;:'",.<>/?]).{8,32}$/;
+            return re.test(pass);
+        }
+
+        window.onload = to_run;
+		// Write your JavaScript code here.
+		// Display the error messages wherever you think it makes most sense.
+		
+	</script>
+</head>
+<body>
+	
+	<h1>Create account</h1>
+	
+	<form id="createAccountForm" method="POST">
+		
+		<div>Email: <input type="text" name="email" id="email"></div>
+		
+		<div>Password: <input type="password" name="password1" id="password1"></div>
+		
+		<div>Password (repeat): <input type="password" name="password2" id="password2"></div>
+		
+		<input type="submit" value="Create account">
+		
+	</form>
+	
+</body>
+</html>

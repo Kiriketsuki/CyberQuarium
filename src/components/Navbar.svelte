@@ -18,10 +18,14 @@
         window.location.href = `/inventory`;
     }
 
+    function toListings() {
+        window.location.href = `/listings`;
+    }
+
     async function logout() {
         // get user from session storage
         var user = window.sessionStorage.getItem("username");
-        const res = await fetch('https://cqflask-v3to2tehtq-lz.a.run.app/logout', {
+        const res = await fetch('http://localhost:5000/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -55,7 +59,9 @@
                 <li><button on:click={toHome} class="navbar-item">Home</button></li>
                 <li><button on:click={toMarket} class="navbar-item">Market</button></li>
                 <li><button on:click={toInventory} class="navbar-item">Inventory</button></li>
+                <li><button on:click={toListings} class="navbar-item">Listings</button></li>
                 <li><button on:click={logout} class="navbar-item logout">Logout</button></li>
+
             </ul>
         </nav>
     {/if}

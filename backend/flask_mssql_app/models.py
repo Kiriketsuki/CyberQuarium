@@ -23,6 +23,7 @@ class User(db.Model):
 
 class Animal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nickname = db.Column(db.String(80), nullable=True)
     image_url = db.Column(db.String, nullable=False)
     dob = db.Column(db.Float, nullable=False)
     rarity = db.Column(db.String, nullable=False)
@@ -35,6 +36,7 @@ class Animal(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'nickname': self.nickname,
             'image_url': self.image_url,
             'dob': self.dob,
             'rarity': self.rarity,
@@ -70,6 +72,7 @@ class MarketListing(db.Model):
     rarity = db.Column(db.String(255), nullable=False)
     yield_rate = db.Column(db.Float, nullable=True)
     sold = db.Column(db.Boolean, default=False)
+    status = db.Column(db.String(255), nullable=False)
 
     def __repr__(self):
         return f"<MarketListing {self.listing_name}>"
@@ -87,5 +90,6 @@ class MarketListing(db.Model):
             'image': self.image,
             'rarity': self.rarity,
             'yield_rate': self.yield_rate,
-            'sold': self.sold
+            'sold': self.sold,
+            'status': self.status
         }

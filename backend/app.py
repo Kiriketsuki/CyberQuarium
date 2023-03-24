@@ -8,7 +8,7 @@ cors = CORS(app)
 
 @app.route('/', methods=['GET'])
 def home():
-    return "Flask server is currently running on localhost:5000."
+    return "Flask server is currently running on http://localhost:5000."
 
 
 @app.route('/login', methods=['POST'])

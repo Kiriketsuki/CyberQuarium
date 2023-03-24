@@ -31,7 +31,7 @@
         console.log(sessionid, username);
 
         // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
-        var response = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/api/session", {
+        var response = await fetch("http://localhost:5000/api/session", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -45,7 +45,7 @@
         if (response.ok) {
             // If the sessionid is valid, get the user from the database
             var response = await fetch(
-                `https://cqflask-v3to2tehtq-lz.a.run.app/api/user/${username}`
+                `http://localhost:5000/api/user/${username}`
             );
 
             if (response.ok) {
@@ -63,7 +63,7 @@
     }
 
     async function get_listings() {
-        var res = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/api/listings", {
+        var res = await fetch("http://localhost:5000/api/listings", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -74,7 +74,7 @@
     }
 
     async function update_egg() {
-        var res = await fetch("https://cqflask-v3to2tehtq-lz.a.run.app/api/create_egg");
+        var res = await fetch("http://localhost:5000/api/create_egg");
         egg = await res.json();
         egg.image =
             "http://photos.newswire.ca/images/20130327_C8486_PHOTO_EN_24852.jpg";
@@ -87,7 +87,7 @@
             showPopup = true;
         } else {
             const response = await fetch(
-                `https://cqflask-v3to2tehtq-lz.a.run.app/api/buy_egg/${username}`,
+                `http://localhost:5000/api/buy_egg/${username}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -133,7 +133,7 @@
             showPopup = true;
         } else {
             const response = await fetch(
-                `https://cqflask-v3to2tehtq-lz.a.run.app/api/buy_listing/${username}`,
+                `http://localhost:5000/api/buy_listing/${username}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -198,7 +198,7 @@
 
     <div class="flex flex-wrap justify-center gap-4">
         {#each listings as listing}
-            {#if listing.sold == false}
+            {#if listing.status == "Listed"}
                 <div class="bg-white p-4 rounded shadow-md text-center w-64">
                     <img
                         src={listing.image}

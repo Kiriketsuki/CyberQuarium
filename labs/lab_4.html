@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Lab 4 - Tabs</title>
+	<style>
+		
+		section{
+			background-color: silver;
+			border-radius: 15px;
+			padding: 15px;
+			margin: 5px;
+		}
+		
+		section h1{
+			margin-top: 0;
+		}
+		
+	</style>
+
+	<script>
+		function to_run() {
+            var sections = document.getElementById("sections");
+            var h1s = document.getElementsByTagName("h1");
+            
+            for (var i = 1; i < sections.children.length; i++) {
+                var section = sections.children[i];
+                toggle_display(section);
+            }
+
+            for (var i = 0; i < h1s.length; i++) {
+                var h1 = h1s[i];
+                h1.setAttribute("onclick", "close_all(document.getElementById('sections')); toggle_display(this.parentElement);");
+            }
+
+        }
+
+        function toggle_display(element) {
+            for (var i = 0; i < element.children.length; i++) {
+                var child = element.children[i];
+                if (child.tagName != "H1") {
+                    if (child.style.display == "none") {
+                        child.style.display = "block";
+                    } else {
+                        child.style.display = "none";
+                    }
+                }
+            }
+        }
+
+        function close_all(sections) {
+            for (var i = 0; i < sections.children.length; i++) {
+                var section = sections.children[i];
+                for (var j = 0; j < section.children.length; j++) {
+                    var child = section.children[j];
+                    if (child.tagName != "H1") {
+                        child.style.display = "none";
+                    }
+                }
+            }
+        }
+        
+        window.onload = to_run;
+	</script>
+</head>
+<body>
+	
+	<div id="sections">
+		
+		<section>
+			<h1>Create account</h1>
+			<p>To use our service you first need to create an account. After you have created an account you can login to it and use our service on any computer with a web browser.</p>
+			<form>
+				<div>Username: <input type="text" name="username"></div>
+				<div>Password: <input type="password" name="password"></div>
+				<input type="submit" value="Create account">
+			</form>
+		</section>
+		
+		<section>
+			<h1>Sign in</h1>
+			<p>To sign in, enter the username and password you entered when you created the account.</p>
+			<form>
+				<div>Username: <input type="text" name="username"></div>
+				<div>Password: <input type="password" name="password"></div>
+				<input type="submit" value="Sign in">
+			</form>
+		</section>
+		
+		<section>
+			<h1>Subscribe</h1>
+			<p>Do you just want to be notified when something new has happened? Then let us know your email and we will send you a message as soon as something interesting has happened.</p>
+			<form>
+				<div>Email: <input type="email" name="email"></div>
+				<input type="submit" value="Subscribe">
+			</form>
+		</section>
+		
+	</div>
+	
+</body>
+</html>
