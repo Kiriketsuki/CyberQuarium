@@ -4,12 +4,12 @@
     import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
     import app from "../../firebase.js";
 
-    let email = "";
-    let password = "";
-    let message = "";
-    let status = "error";
-    let showMessage = false;
-    let user = {};
+    var email = "";
+    var password = "";
+    var message = "";
+    var status = "error";
+    var showMessage = false;
+    var user = {};
 
 
     async function loginUser() {

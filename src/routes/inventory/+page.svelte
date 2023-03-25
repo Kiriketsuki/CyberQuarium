@@ -13,7 +13,6 @@
     var showPopup = false;
     var isLoading = false;
     var listing = false;
-    var listingId = null;
 
     onMount(async () => {
         // isLoading = true;

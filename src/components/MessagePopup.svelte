@@ -1,9 +1,8 @@
-<!-- MessagePopup.svelte -->
 <script>
-    export let message = "";
-    export let status = "error";
-    export let onClose = () => {};
-    export let onSuccess = () => {};
+    export var message = "";
+    export var status = "error";
+    export var onClose = function () {};
+    export var onSuccess = function () {};
 </script>
 
 <div
@@ -30,15 +29,14 @@
             {/if}
 
             {#if status === "success"}
-            <button
-                on:click={onSuccess}
-                class="mt-4 bg-green-500 text-green px-4 py-2 rounded self-center z-100"
-            >
-                Proceed
-            </button>
-        {/if}
+                <button
+                    on:click={onSuccess}
+                    class="mt-4 bg-green-500 text-green px-4 py-2 rounded self-center z-100"
+                >
+                    Proceed
+                </button>
+            {/if}
         </div>
-        
     </div>
 </div>
 

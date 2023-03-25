@@ -3,7 +3,7 @@
     import { onMount } from "svelte";
     import Navbar from "../../components/Navbar.svelte";
 
-    let username = "";
+    var username = "";
     var user = {};
 
     onMount(async () => {
@@ -13,15 +13,15 @@
 
     async function check_session() {
         // Check if the sessionid is valid
-        var sessionid = window.sessionStorage.getItem("sessionid");
+        var sessionId = window.sessionStorage.getItem("sessionid");
         var username = window.sessionStorage.getItem("username");
 
-        if (!sessionid || !username) {
+        if (!sessionId || !username) {
             // Redirect to the login page if the sessionid or username is not present
             window.location.href = "/login";
         }
 
-        console.log(sessionid, username)
+        console.log(sessionId, username)
 
         // Send a request to the server to check if the sessionid is valid. The payload is the username and the sessionid
         var response = await fetch("http://localhost:5000/api/session", {
@@ -31,7 +31,7 @@
             },
             body: JSON.stringify({
                 username: username,
-                sessionid: sessionid,
+                sessionid: sessionId,
             }),
         });
 

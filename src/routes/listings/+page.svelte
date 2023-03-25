@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import Navbar from '../../components/Navbar.svelte';
 
-    let listings = [];
+    var listings = [];
     var user = {};
     var isEditing = false;
     var currListing = {};
