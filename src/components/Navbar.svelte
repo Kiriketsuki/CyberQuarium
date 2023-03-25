@@ -47,7 +47,7 @@
 
 <aside class="navbar">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="navbar-brand" on:click={toggleNav}>CyberQuarium</div>
+    <div class="navbar-brand bg-dark_blue" on:click={toggleNav}>CyberQuarium</div>
     {#if isOpen}
         <nav
             class="navbar-menu"
