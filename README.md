@@ -6,17 +6,17 @@ Jönköping University 2023
 
 ## Table of Contents
 <ul>
-    <li> <a href="#"> Introduction </a> </li>
-    <li> <a href="#"> Graphical User Interface </a> </li>
-    <li> <a href="#"> Architecture </a> </li>
-    <li> <a href="#"> REST API </a> </li>
-    <li> <a href="#"> Frontend </a> </li>
-    <li> <a href="#"> Database </a> </li>
-    <li> <a href="#"> Backend </a> </li>
-    <li> <a href="#"> Worklog </a> </li>
+    <li> <a href="#intro"> Introduction </a> </li>
+    <li> <a href="#gui"> Graphical User Interface </a> </li>
+    <li> <a href="#arch"> Architecture </a> </li>
+    <li> <a href="#api"> REST API </a> </li>
+    <li> <a href="#frontend"> Frontend </a> </li>
+    <li> <a href="#db"> Database </a> </li>
+    <li> <a href="#backend"> Backend </a> </li>
+    <li> <a href="#worklog"> Worklog </a> </li>
 </ul>
 
-Introduction
+## Introduction {#intro}
 
 CyberQuarium is a web application that enables users to hatch and breed virtual animals. The platform
 was created as a fun and interactive way for users to engage with virtual pets and experiment with
