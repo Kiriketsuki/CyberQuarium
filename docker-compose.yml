@@ -4,14 +4,14 @@ services:
   svelte:
     container_name: svelte_container
     build:
-      context: ../
+      context: ./
     ports:
       - "4173:4173"
 
   flask:
     container_name: flask_container
     build:
-      context: ../backend/flask_mssql_app
+      context: ./backend/flask_mssql_app
     ports:
       - "5000:5000"
     depends_on:
