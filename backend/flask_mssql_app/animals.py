@@ -1,4 +1,3 @@
-# ! COPIED HERE COS IDK HOW to IMPORT
 import random
 import time
 import requests
@@ -19,11 +18,13 @@ class Animal:
 
     # Dynamic
     def __init__(self, *args):
+        # args should be [rarity, species, name, yield]
+        animal_properties = args
 
-        self.dob = time.time()
-        if len(args) == 1:
+        self.date_of_birth = time.time()
+        if len(animal_properties) == 1:
             # Date of birth is the time the animal was created
-            self.rarity = args[0]
+            self.rarity = animal_properties[0]
             # Species of the animal can be [Fish, Mammal, Reptile, Amphibian]
             animal_type = random.choice(species)
             self.species = animal_type
@@ -42,11 +43,11 @@ class Animal:
 
             self.set_yield()
         else:
-            # args should be [rarity, species, name, yield]
-            self.rarity = args[0]
-            self.species = args[1]
-            self.name = args[2]
-            self.coin_yield = args[3]
+            # animal_properties should be [rarity, species, name, yield]
+            self.rarity = animal_properties[0]
+            self.species = animal_properties[1]
+            self.name = animal_properties[2]
+            self.coin_yield = animal_properties[3]
 
         self.coins_yielded = 0
         self.id = Animal.num_animals + 1
@@ -77,7 +78,7 @@ class Animal:
         # Get current time
         current_time = time.time()
         # Get the time difference between current time and date of birth
-        time_diff = current_time - self.dob
+        time_diff = current_time - self.date_of_birth
         # Get the number of hours passed since the animal was created
         hours_passed = time_diff / 3600
         # Get the number of coins yielded by the animal
@@ -143,12 +144,14 @@ class Egg:
     def __init__(self, *args):
         # Rarity of the egg can be from [common, uncommon, rare, epic, legendary]
         # The spawn rate of each rarity is 50%, 30%, 15%, 4%, 1% respectively
-        if len(args) < 2:
+        egg_properties = args
+
+        if len(egg_properties) < 2:
             self.rarity = random.choices(['common', 'uncommon', 'rare', 'epic', 'legendary'], weights=[50, 30, 15, 4, 1])[0]
             self.cost = 20
         else:
-            self.rarity = args[0]
-            self.cost = args[1]
+            self.rarity = egg_properties[0]
+            self.cost = egg_properties[1]
 
     def get_rarity(self):
         return self.rarity

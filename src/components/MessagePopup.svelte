@@ -1,8 +1,8 @@
 <script>
-    export var message = "";
-    export var status = "error";
-    export var onClose = function () {};
-    export var onSuccess = function () {};
+    export let message = "";
+    export let status = "error";
+    export let onClose = function () {};
+    export let onSuccess = function () {};
 </script>
 
 <div

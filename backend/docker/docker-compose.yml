@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  svelte:
+    container_name: svelte_container
+    build:
+      context: ../
+    ports:
+      - "4173:4173"
+
+  flask:
+    container_name: flask_container
+    build:
+      context: ../backend/flask_mssql_app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  db:
+    container_name: mysql_container
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cyberquarium_db
+      MYSQL_USER: kiri
+      MYSQL_PASSWORD: kiri@KIROG
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
