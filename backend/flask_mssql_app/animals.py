@@ -21,7 +21,7 @@ class Animal:
         # args should be [rarity, species, name, yield]
         animal_properties = args
 
-        self.date_of_birth = time.time()
+        self.dob = time.time()
         if len(animal_properties) == 1:
             # Date of birth is the time the animal was created
             self.rarity = animal_properties[0]
@@ -78,7 +78,7 @@ class Animal:
         # Get current time
         current_time = time.time()
         # Get the time difference between current time and date of birth
-        time_diff = current_time - self.date_of_birth
+        time_diff = current_time - self.dob
         # Get the number of hours passed since the animal was created
         hours_passed = time_diff / 3600
         # Get the number of coins yielded by the animal
@@ -107,7 +107,8 @@ class Animal:
             )
             url = res.json()['output_url']
         except:
-            url = "https://www.gannett-cdn.com/presto/2022/10/24/USAT/6253d26d-8894-4a38-87ee-6c2f37b1c0d2-7._Miroslav-Srb_Hello-everyone_00001567.jpg?crop=2999,1687,x0,y300&width=1600&height=800&format=pjpg&auto=webp"
+            # url = "https://www.gannett-cdn.com/presto/2022/10/24/USAT/6253d26d-8894-4a38-87ee-6c2f37b1c0d2-7._Miroslav-Srb_Hello-everyone_00001567.jpg?crop=2999,1687,x0,y300&width=1600&height=800&format=pjpg&auto=webp"
+            url = "nil"
         return url
 
         

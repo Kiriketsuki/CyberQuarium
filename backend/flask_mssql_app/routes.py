@@ -1,6 +1,5 @@
 # routes.py
-from flask import Blueprint, jsonify, request, make_response
-from flask_jwt import jwt_required
+from flask import Blueprint, jsonify, request
 from . import db
 from .models import User, Animal, Egg, MarketListing
 import re
@@ -154,7 +153,6 @@ def logout():
 
 
 @main.route('/api/session', methods=['POST'])
-@jwt_required()
 def check_session():
     data = request.get_json()
     username = data.get('username')
@@ -176,7 +174,6 @@ def check_session():
 
 
 @main.route('/api/user/<username>', methods=['GET'])
-@jwt_required()
 def get_user(username):
     user = User.query.filter_by(username=username).first()
     if user:
@@ -193,14 +190,12 @@ def get_user(username):
 
 
 @main.route('/api/create_egg')
-@jwt_required()
 def create_egg():
     egg = EggClass()
     return jsonify({"rarity": egg.get_rarity(), "cost": egg.get_cost()})
 
 
 @main.route('/api/buy_egg/<string:username>', methods=['POST'])
-@jwt_required()
 def buy_egg(username):
     user = User.query.filter_by(username=username).first()
 
@@ -229,7 +224,6 @@ def buy_egg(username):
 
 
 @main.route('/api/buy_listing/<string:username>', methods=['POST'])
-@jwt_required()
 def buy_listing(username):
     user = User.query.filter_by(username=username).first()
 
@@ -278,7 +272,6 @@ def buy_listing(username):
 
 
 @main.route('/api/user/<string:username>/eggs', methods=['GET'])
-@jwt_required()
 def get_eggs(username):
     user = User.query.filter_by(username=username).first()
 
@@ -290,7 +283,6 @@ def get_eggs(username):
 
 
 @main.route('/api/user/<string:username>/animals', methods=['GET'])
-@jwt_required()
 def get_animals(username):
     user = User.query.filter_by(username=username).first()
 
@@ -302,7 +294,6 @@ def get_animals(username):
 
 
 @main.route('/hatch', methods=['POST'])
-@jwt_required()
 def hatch():
     data = request.get_json()
     print(data)
@@ -329,7 +320,6 @@ def hatch():
 
 
 @main.route('/api/update_coins')
-@jwt_required()
 def update_coins():
     current_time = time.time()
     animals = Animal.query.all()
@@ -344,7 +334,6 @@ def update_coins():
 
 
 @main.route('/api/burn_animal', methods=['POST'])
-@jwt_required()
 def burn_animal():
     get_coin_update()
     data = request.json
@@ -374,7 +363,6 @@ def burn_animal():
 
 
 @main.route('/api/breed_animals', methods=['POST'])
-@jwt_required()
 def breed_animals():
     animal_id_1 = request.json.get('animal_id_1')
     animal_id_2 = request.json.get('animal_id_2')
@@ -411,7 +399,6 @@ def breed_animals():
 
 
 @main.route("/api/market_listing", methods=["POST"])
-@jwt_required()
 def list_on_market():
     data = request.get_json()
     user_id = data.get('user_id')
@@ -472,7 +459,6 @@ def list_on_market():
 
 
 @main.route("/api/listings", methods=["GET"])
-@jwt_required()
 def get_listings():
     listings = MarketListing.query.all()
     listings = [listing.to_dict() for listing in listings]
@@ -480,7 +466,6 @@ def get_listings():
 
 
 @main.route("/api/user_listings", methods=["POST"])
-@jwt_required()
 def get_user_listings():
     data = request.get_json()
     username = data.get('username')
@@ -494,7 +479,6 @@ def get_user_listings():
 
 
 @main.route("/api/update_listing", methods=["POST"])
-@jwt_required()
 def update_listing():
     data = request.get_json()
     listing_id = data.get('id')
@@ -512,7 +496,6 @@ def update_listing():
 
 
 @main.route("/api/cancel_listing", methods=["POST"])
-@jwt_required()
 def cancel_listing():
     data = request.get_json()
     listing_id = data.get('id')
@@ -551,7 +534,6 @@ def cancel_listing():
 
 
 @main.route("/api/animal", methods=["POST"])
-@jwt_required()
 def get_animal():
     data = request.get_json()
     animal_id = data.get('animal_id')
@@ -568,7 +550,6 @@ def get_animal():
 
 
 @main.route("/api/update_nickname", methods=["POST"])
-@jwt_required()
 def update_nickname():
     data = request.get_json()
     animal_id = data.get('animal_id')

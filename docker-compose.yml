@@ -14,20 +14,23 @@ services:
       context: ./backend/flask_mssql_app
     ports:
       - "5000:5000"
+    links:
+      - mysql_db
     depends_on:
-      - db
+      - mysql_db
 
-  db:
+  mysql_db:
     container_name: mysql_container
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: cyberquarium_db
       MYSQL_USER: kiri
-      MYSQL_PASSWORD: kiri@KIROG
+      MYSQL_PASSWORD: kiriKIROG
     ports:
       - "3306:3306"
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
 
 volumes:

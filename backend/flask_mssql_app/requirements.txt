@@ -1,7 +1,6 @@
 Flask
 Flask-SQLAlchemy
 Flask-Migrate
-Flask-JWT
 flask_cors
 pyodbc
 requests
@@ -9,3 +8,5 @@ nltk
 g2p_en
 autopep8
 pymysql==1.0.2
+cryptography
+mysql-connector-python

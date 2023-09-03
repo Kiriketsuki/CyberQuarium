@@ -23,11 +23,11 @@ class User(db.Model):
 class Animal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(80), nullable=True)
-    image_url = db.Column(db.String, nullable=False)
+    image_url = db.Column(db.String(16000000), nullable=False)
     dob = db.Column(db.Float, nullable=False)
-    rarity = db.Column(db.String, nullable=False)
-    species = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False)
+    rarity = db.Column(db.String(80), nullable=False)
+    species = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(80), nullable=False)
     coin_yield = db.Column(db.Float, nullable=False)
     coins_yielded = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -47,7 +47,7 @@ class Animal(db.Model):
 
 class Egg(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    rarity = db.Column(db.String, nullable=False)
+    rarity = db.Column(db.String(80), nullable=False)
     cost = db.Column(db.Float, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
